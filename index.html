@@ -123,6 +123,14 @@ tbody td.d{color:var(--muted)}
 /* ── DRAG SCROLL ── */
 .drag-scroll{cursor:grab;user-select:none}
 .drag-scroll.dragging{cursor:grabbing}
+
+.sf-chip-btn{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.06em;padding:5px 14px;border-radius:20px;border:1px solid var(--line2);background:transparent;color:var(--muted2);cursor:pointer;transition:all .15s}
+.sf-chip-btn:hover{color:var(--text)}
+.sf-chip-btn.active{background:var(--cyan);border-color:var(--cyan);color:#000;font-weight:600}
+.sf-tgp{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.06em;padding:5px 14px;border-radius:20px;border:1px solid var(--line2);background:transparent;color:var(--muted2);cursor:pointer;transition:all .15s}
+.sf-tgp:hover{color:var(--text)}
+.sf-tgp.active{background:var(--bg3);border-color:var(--muted2);color:var(--text)}
+
 </style>
 </head>
 <body>
@@ -235,6 +243,35 @@ tbody td.d{color:var(--muted)}
   <div class="tile-grid tile-grid-2" id="pcmark-grid"></div>
 </div>
 
+
+
+<div class="section" id="spec-filter">
+  <div class="section-header">
+    <span class="section-idx">06 —</span>
+    <h2 class="section-name">Spec Filter</h2>
+    <span class="section-sub">เลือก GPU หรือ CPU แล้วดูเปรียบเทียบทุกรุ่นที่ใช้สเปคนั้น</span>
+  </div>
+  <div style="display:flex;gap:.6rem;margin-bottom:1.2rem">
+    <button id="sf-tab-gpu" onclick="sfSetTab('gpu')" style="font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:.1em;text-transform:uppercase;padding:7px 20px;border-radius:3px;border:1px solid var(--cyan);background:var(--cyan);color:#000;cursor:pointer;font-weight:600">GPU</button>
+    <button id="sf-tab-cpu" onclick="sfSetTab('cpu')" style="font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:.1em;text-transform:uppercase;padding:7px 20px;border-radius:3px;border:1px solid var(--line2);background:transparent;color:var(--muted2);cursor:pointer">CPU</button>
+  </div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem" id="sf-chip-label">เลือก GPU</div>
+  <div id="sf-chips" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.2rem"></div>
+  <div id="sf-tgp-wrap" style="margin-bottom:1.2rem">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem">TGP (วัตต์)</div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap" id="sf-tgp-chips">
+      <button class="sf-tgp active" data-tgp="all" onclick="sfSetTgp(this,'all')">ทั้งหมด</button>
+      <button class="sf-tgp" data-tgp="60-100" onclick="sfSetTgp(this,'60-100')">60–100W</button>
+      <button class="sf-tgp" data-tgp="100-140" onclick="sfSetTgp(this,'100-140')">100–140W</button>
+      <button class="sf-tgp" data-tgp="140+" onclick="sfSetTgp(this,'140+')">140W+</button>
+    </div>
+  </div>
+  <div id="sf-result-count" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);margin-bottom:.8rem"></div>
+  <div class="tbl-wrap" id="sf-table-wrap" style="display:none">
+    <table><thead><tr id="sf-thead"></tr></thead><tbody id="sf-tbody"></tbody></table>
+  </div>
+  <div id="sf-empty" style="padding:2rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--muted)">เลือก spec ด้านบนเพื่อดูผลเปรียบเทียบ</div>
+</div>
 
 <div class="section" id="compare">
   <div class="section-header">
@@ -2836,6 +2873,70 @@ renderCompareTable=function(){_origRenderCompareTable();setTimeout(()=>{const c=
 
 // init on load
 setTimeout(applyDragScrolls,200);
+
+// ── SPEC FILTER ──────────────────────────────────────────────
+let sfTab='gpu',sfSelectedSpecs=new Set(),sfTgp='all';
+function sfExtractGpu(spec){if(!spec)return null;const m=spec.match(/RTX\s*\d{4}(?:\s*Ti)?(?:\s*Super)?/i);return m?m[0].replace(/\s+/,' ').trim():null;}
+function sfExtractCpu(spec){if(!spec)return null;const m=spec.match(/(?:Core Ultra \d+|i[579]-\d{4,5}[A-Z]*|Ryzen [579] \w+)/i);return m?m[0].trim():null;}
+function sfExtractTgp(spec){if(!spec)return null;const m=spec.match(/(\d+)\s*W/i);return m?parseInt(m[1]):null;}
+function sfTgpMatch(tgp){if(sfTgp==='all')return true;if(tgp==null)return false;if(sfTgp==='60-100')return tgp>=60&&tgp<=100;if(sfTgp==='100-140')return tgp>100&&tgp<=140;if(sfTgp==='140+')return tgp>140;return true;}
+function sfSetTab(tab){
+  sfTab=tab;sfSelectedSpecs=new Set();sfTgp='all';
+  document.getElementById('sf-tgp-wrap').style.display=tab==='gpu'?'':'none';
+  document.querySelectorAll('.sf-tgp').forEach(b=>b.classList.toggle('active',b.dataset.tgp==='all'));
+  ['gpu','cpu'].forEach(t=>{
+    const el=document.getElementById('sf-tab-'+t);
+    const on=t===tab;
+    el.style.background=on?'var(--cyan)':'transparent';
+    el.style.color=on?'#000':'var(--muted2)';
+    el.style.borderColor=on?'var(--cyan)':'var(--line2)';
+    el.style.fontWeight=on?'600':'400';
+  });
+  document.getElementById('sf-chip-label').textContent=tab==='gpu'?'เลือก GPU':'เลือก CPU';
+  populateSpecChips();renderSpecFilter();
+}
+function sfSetTgp(el,val){sfTgp=val;document.querySelectorAll('.sf-tgp').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderSpecFilter();}
+function sfToggleChip(spec){if(sfSelectedSpecs.has(spec))sfSelectedSpecs.delete(spec);else sfSelectedSpecs.add(spec);document.querySelectorAll('.sf-chip-btn').forEach(b=>{b.classList.toggle('active',sfSelectedSpecs.has(b.dataset.spec));});renderSpecFilter();}
+function populateSpecChips(){
+  const extFn=sfTab==='gpu'?sfExtractGpu:sfExtractCpu;
+  const specs=[...new Set(D.map(l=>extFn(l.spec)).filter(Boolean))].sort();
+  document.getElementById('sf-chips').innerHTML=specs.map(s=>`<button class="sf-chip-btn" data-spec="${s}" onclick="sfToggleChip('${s}')">${s}</button>`).join('');
+}
+function renderSpecFilter(){
+  const extFn=sfTab==='gpu'?sfExtractGpu:sfExtractCpu;
+  const scoreKey=sfTab==='gpu'?'timeSpy':'cbR23M';
+  const scoreLabel=sfTab==='gpu'?'Time Spy':'Cinebench R23 Multi';
+  let filtered=D.filter(l=>{
+    const spec=extFn(l.spec);
+    const tgp=sfExtractTgp(l.spec);
+    return (sfSelectedSpecs.size===0||sfSelectedSpecs.has(spec))&&(sfTab==='cpu'||sfTgpMatch(tgp))&&l[scoreKey]!=null;
+  }).sort((a,b)=>b[scoreKey]-a[scoreKey]);
+  const cnt=document.getElementById('sf-result-count');
+  const wrap=document.getElementById('sf-table-wrap');
+  const empty=document.getElementById('sf-empty');
+  if(filtered.length===0){wrap.style.display='none';empty.style.display='block';cnt.textContent=sfSelectedSpecs.size===0?'เลือก spec ด้านบนเพื่อดูผลเปรียบเทียบ':'ไม่พบข้อมูลที่ตรงกัน';return;}
+  wrap.style.display='block';empty.style.display='none';
+  const specList=sfSelectedSpecs.size>0?[...sfSelectedSpecs].join(' / '):'ทั้งหมด';
+  cnt.textContent=`แสดง ${filtered.length} รุ่น · ${specList}`;
+  const maxScore=filtered[0][scoreKey];
+  document.getElementById('sf-thead').innerHTML=`<tr><th>รุ่น</th><th>${sfTab==='gpu'?'GPU':'CPU'}</th><th style="min-width:220px">${scoreLabel}</th>${sfTab==='gpu'?'<th style="text-align:center">TGP</th>':''}<th style="text-align:right">% ความต่าง</th></tr>`;
+  document.getElementById('sf-tbody').innerHTML=filtered.map((l,idx)=>{
+    const spec=extFn(l.spec)||'—';
+    const tgp=sfExtractTgp(l.spec);
+    const score=l[scoreKey];
+    const pct=(score/maxScore)*100;
+    const diff=idx===0?'100%':`-${(100-pct).toFixed(1)}%`;
+    const diffColor=idx===0?'var(--cyan)':'var(--red)';
+    const topBadge=idx===0?`<span style="display:inline-block;padding:1px 7px;border-radius:3px;font-size:11px;background:rgba(200,169,110,.15);color:var(--cyan);margin-left:6px;font-family:'JetBrains Mono',monospace">top</span>`:'';
+    const brandC=bc(l.brand);
+    const tgpCell=sfTab==='gpu'?`<td style="text-align:center;color:var(--muted2);font-family:'JetBrains Mono',monospace;font-size:14px">${tgp!=null?tgp+'W':'—'}</td>`:'';
+    return `<tr><td><div style="font-weight:600;font-size:15px">${l.model}${topBadge}</div><div style="font-size:13px;color:var(--muted);font-family:'JetBrains Mono',monospace">${l.brand} · ${l.year||''}</div></td><td><span style="font-family:'JetBrains Mono',monospace;font-size:12px;padding:2px 9px;border-radius:3px;border:1px solid ${brandC}44;color:${brandC};background:${brandC}11">${spec}</span></td><td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;min-width:80px"><div style="height:100%;width:${pct.toFixed(1)}%;background:var(--cyan);border-radius:3px"></div></div><span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;min-width:54px;text-align:right">${fmt(score)}</span></div></td>${tgpCell}<td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;color:${diffColor}">${diff}</td></tr>`;
+  }).join('');
+}
+function initSpecFilter(){populateSpecChips();renderSpecFilter();}
+// ─────────────────────────────────────────────────────────────
+
+initSpecFilter();
 </script>
 </body>
 </html>
