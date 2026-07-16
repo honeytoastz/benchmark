@@ -334,6 +334,34 @@ const N=v=>v!=null&&v!==''&&!isNaN(v)?Number(v):null;
 const fmt=(v,d=0)=>v!=null?v.toLocaleString('en-US',{maximumFractionDigits:d}):'—';
 const pct=(v,mx)=>mx?Math.round((v/mx)*100):0;
 const tcls=v=>v==null?'':v<60?'tc-cool':v<85?'tc-warm':'tc-hot';
+const sfBadgeStyle = (spec, type) => {
+  let color = '';
+  let bgColor = '';
+  if (type === 'gpu') {
+    if (spec.includes('RTX')) {
+      color = '#76b900';
+      bgColor = 'rgba(118,185,0,.08)';
+    } else if (spec.includes('RX')) {
+      color = '#ed1c24';
+      bgColor = 'rgba(237,28,36,.08)';
+    } else if (spec.includes('Radeon')) {
+      color = '#9b6fff';
+      bgColor = 'rgba(155,111,255,.08)';
+    }
+  } else if (type === 'cpu') {
+    if (spec.includes('Intel') || spec.includes('Core') || /i[3579]-\d/.test(spec)) {
+      color = '#0068b5';
+      bgColor = 'rgba(0,104,181,.08)';
+    } else if (spec.includes('AMD') || spec.includes('Ryzen')) {
+      color = '#ed1c24';
+      bgColor = 'rgba(237,28,36,.08)';
+    }
+  }
+  if (color) {
+    return `border: 2px solid ${color}; color: ${color}; background: ${bgColor};`;
+  }
+  return '';
+};
 const tbcls=v=>v==null?'t-cool':v<60?'t-cool':v<85?'t-warm':'t-hot';
 
 const D=[
@@ -2875,13 +2903,25 @@ renderCompareTable=function(){_origRenderCompareTable();setTimeout(()=>{const c=
 setTimeout(applyDragScrolls,200);
 
 // ── SPEC FILTER ──────────────────────────────────────────────
-let sfTab='gpu',sfSelectedSpecs=new Set(),sfTgp='all';
-function sfExtractGpu(spec){if(!spec)return null;const m=spec.match(/RTX\s*\d{4}(?:\s*Ti)?(?:\s*Super)?/i);return m?m[0].replace(/\s+/,' ').trim():null;}
+let sfTab='gpu',sfSelectedSpecs=new Set(),sfSelectedBrands=new Set(),sfTgp='all';
+function sfExtractGpu(spec){if(!spec)return null;const m=spec.match(/(?:RTX\s*\d{4}(?:\s*Ti)?(?:\s*Super)?|RX\s*\d{4}S?)/i);return m?m[0].replace(/\s+/g,' ').trim():null;}
 function sfExtractCpu(spec){if(!spec)return null;const m=spec.match(/(?:Core Ultra \d+|i[579]-\d{4,5}[A-Z]*|Ryzen [579] \w+)/i);return m?m[0].trim():null;}
 function sfExtractTgp(spec){if(!spec)return null;const m=spec.match(/(\d+)\s*W/i);return m?parseInt(m[1]):null;}
 function sfTgpMatch(tgp){if(sfTgp==='all')return true;if(tgp==null)return false;if(sfTgp==='60-100')return tgp>=60&&tgp<=100;if(sfTgp==='100-140')return tgp>100&&tgp<=140;if(sfTgp==='140+')return tgp>140;return true;}
+
+const getGpuBrandCategory = (spec) => {
+  if (spec.includes('RTX')) return 'NVIDIA';
+  if (spec.includes('RX')) return 'AMD GPU';
+  if (spec.includes('Radeon')) return 'AMD iGPU';
+  return '';
+};
+const getCpuBrandCategory = (spec) => {
+  if (spec.includes('Intel') || spec.includes('Core') || /i[3579]-\d/.test(spec)) return 'Intel';
+  if (spec.includes('AMD') || spec.includes('Ryzen')) return 'AMD';
+  return '';
+};
 function sfSetTab(tab){
-  sfTab=tab;sfSelectedSpecs=new Set();sfTgp='all';
+  sfTab=tab;sfSelectedSpecs=null;sfSelectedBrands=new Set();sfTgp='all';
   document.getElementById('sf-tgp-wrap').style.display=tab==='gpu'?'':'none';
   document.querySelectorAll('.sf-tgp').forEach(b=>b.classList.toggle('active',b.dataset.tgp==='all'));
   ['gpu','cpu'].forEach(t=>{
@@ -2896,11 +2936,11 @@ function sfSetTab(tab){
   populateSpecChips();renderSpecFilter();
 }
 function sfSetTgp(el,val){sfTgp=val;document.querySelectorAll('.sf-tgp').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderSpecFilter();}
-function sfToggleChip(spec){if(sfSelectedSpecs.has(spec))sfSelectedSpecs.delete(spec);else sfSelectedSpecs.add(spec);document.querySelectorAll('.sf-chip-btn').forEach(b=>{b.classList.toggle('active',sfSelectedSpecs.has(b.dataset.spec));});renderSpecFilter();}
+function sfToggleBrand(brand){if(sfSelectedBrands.has(brand))sfSelectedBrands.delete(brand);else sfSelectedBrands.add(brand);document.querySelectorAll('.sf-chip-btn').forEach(b=>{b.classList.toggle('active',sfSelectedBrands.has(b.dataset.brand));});renderSpecFilter();}
 function populateSpecChips(){
-  const extFn=sfTab==='gpu'?sfExtractGpu:sfExtractCpu;
-  const specs=[...new Set(D.map(l=>extFn(l.spec)).filter(Boolean))].sort();
-  document.getElementById('sf-chips').innerHTML=specs.map(s=>`<button class="sf-chip-btn" data-spec="${s}" onclick="sfToggleChip('${s}')">${s}</button>`).join('');
+  const brandCategoryFn = sfTab==='gpu'?getGpuBrandCategory:getCpuBrandCategory;
+  const brandCategories=[...new Set(D.map(l=>brandCategoryFn(l.spec)).filter(Boolean))].sort();
+  document.getElementById('sf-chips').innerHTML=brandCategories.map(bc=>`<button class="sf-chip-btn" data-brand="${bc}" onclick="sfToggleBrand('${bc}')">${bc}</button>`).join('');
 }
 function renderSpecFilter(){
   const extFn=sfTab==='gpu'?sfExtractGpu:sfExtractCpu;
