@@ -131,7 +131,27 @@ tbody td.d{color:var(--muted)}
 .sf-tgp:hover{color:var(--text)}
 .sf-tgp.active{background:var(--bg3);border-color:var(--muted2);color:var(--text)}
 
-</style>
+
+/* Score chip styles */
+.sf-score-chip{
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  letter-spacing:.06em;
+  padding:5px 14px;
+  border-radius:20px;
+  border:1px solid var(--line2);
+  background:transparent;
+  color:var(--muted2);
+  cursor:pointer;
+  transition:all .15s;
+}
+.sf-score-chip:hover{color:var(--text)}
+.sf-score-chip.active{
+  background:var(--cyan);
+  border-color:var(--cyan);
+  color:#000;
+  font-weight:600;
+}</style>
 </head>
 <body>
 
@@ -257,6 +277,9 @@ tbody td.d{color:var(--muted)}
   </div>
   <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem" id="sf-chip-label">เลือก GPU</div>
   <div id="sf-chips" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.2rem"></div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem">หมวดคะแนน</div>
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap" id="sf-score-chips">
+  </div>
   <div id="sf-tgp-wrap" style="margin-bottom:1.2rem">
     <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem">TGP (วัตต์)</div>
     <div style="display:flex;gap:.5rem;flex-wrap:wrap" id="sf-tgp-chips">
@@ -2446,6 +2469,31 @@ const D=[
   }
 ];;
 
+const GPU_SPECS = {
+  'RTX 5090': {cuda:'21760', vram:'24GB GDDR7'},
+  'RTX 5080': {cuda:'10752', vram:'16GB GDDR7'},
+  'RTX 5070 Ti': {cuda:'8960', vram:'16GB GDDR7'},
+  'RTX 5070': {cuda:'6144', vram:'12GB GDDR7'},
+  'RTX 5060': {cuda:'3840', vram:'8GB GDDR7'},
+  'RTX 5050': {cuda:'2560', vram:'8GB GDDR7'},
+  'RTX 4090': {cuda:'16384', vram:'16GB GDDR6'},
+  'RTX 4080': {cuda:'7680', vram:'12GB GDDR6'},
+  'RTX 4070': {cuda:'4608', vram:'8GB GDDR6'},
+  'RTX 4060': {cuda:'3072', vram:'8GB GDDR6'},
+  'RX 8060S': {cuda:'16 CU', vram:'shared'},
+};
+const CPU_SPECS = {
+  'Core Ultra 9 275HX': {cores:'24C', threads:'24T'},
+  'Core Ultra 9 386H': {cores:'18C', threads:'22T'},
+  'Core Ultra 7 265H': {cores:'16C', threads:'22T'},
+  'Core Ultra 5 245H': {cores:'14C', threads:'18T'},
+  'Ryzen AI Max+ 395': {cores:'16C', threads:'32T'},
+  'Ryzen 7 250': {cores:'8C', threads:'16T'},
+  'Ryzen 5 240': {cores:'6C', threads:'12T'},
+  'i9-14900HX': {cores:'24C', threads:'32T'},
+  'i7-14700HX': {cores:'20C', threads:'28T'},
+};
+
 let activeBrand='ALL';
 let activeYear='ALL';
 let activeSeries='ALL';
@@ -2903,8 +2951,8 @@ renderCompareTable=function(){_origRenderCompareTable();setTimeout(()=>{const c=
 setTimeout(applyDragScrolls,200);
 
 // ── SPEC FILTER ──────────────────────────────────────────────
-let sfTab='gpu',sfSelectedSpecs=new Set(),sfSelectedBrands=new Set(),sfTgp='all';
-function sfExtractGpu(spec){if(!spec)return null;const m=spec.match(/(?:RTX\s*\d{4}(?:\s*Ti)?(?:\s*Super)?|RX\s*\d{4}S?)/i);return m?m[0].replace(/\s+/g,' ').trim():null;}
+let sfTab='gpu',sfSelectedSpecs=new Set(),sfSelectedBrands=new Set(),sfTgp='all',sfScoreMetric=sfTab==='gpu'?'timeSpy':'cbR23M';
+function sfExtractGpu(spec){if(!spec)return null;const m=spec.match(/(?:RTX\s*\d{4}(?:\s*Ti)?(?:\s*Super)?|RX\s*\d{4}S?|Radeon\s*\d{4}S?)/i);return m?m[0].replace(/\s+/g,' ').trim():null;}
 function sfExtractCpu(spec){if(!spec)return null;const m=spec.match(/(?:Core Ultra \d+|i[579]-\d{4,5}[A-Z]*|Ryzen [579] \w+)/i);return m?m[0].trim():null;}
 function sfExtractTgp(spec){if(!spec)return null;const m=spec.match(/(\d+)\s*W/i);return m?parseInt(m[1]):null;}
 function sfTgpMatch(tgp){if(sfTgp==='all')return true;if(tgp==null)return false;if(sfTgp==='60-100')return tgp>=60&&tgp<=100;if(sfTgp==='100-140')return tgp>100&&tgp<=140;if(sfTgp==='140+')return tgp>140;return true;}
@@ -2922,6 +2970,8 @@ const getCpuBrandCategory = (spec) => {
 };
 function sfSetTab(tab){
   sfTab=tab;sfSelectedSpecs=null;sfSelectedBrands=new Set();sfTgp='all';
+  // Reset score metric when tab changes
+  sfScoreMetric=sfTab==='gpu'?'timeSpy':'cbR23M';
   document.getElementById('sf-tgp-wrap').style.display=tab==='gpu'?'':'none';
   document.querySelectorAll('.sf-tgp').forEach(b=>b.classList.toggle('active',b.dataset.tgp==='all'));
   ['gpu','cpu'].forEach(t=>{
@@ -2936,16 +2986,36 @@ function sfSetTab(tab){
   populateSpecChips();renderSpecFilter();
 }
 function sfSetTgp(el,val){sfTgp=val;document.querySelectorAll('.sf-tgp').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderSpecFilter();}
+function sfSetScore(el,val){sfScoreMetric=val;document.querySelectorAll('.sf-score-chip').forEach(b=>b.classList.remove('active'));el.classList.add('active');renderSpecFilter();}
 function sfToggleBrand(brand){if(sfSelectedBrands.has(brand))sfSelectedBrands.delete(brand);else sfSelectedBrands.add(brand);document.querySelectorAll('.sf-chip-btn').forEach(b=>{b.classList.toggle('active',sfSelectedBrands.has(b.dataset.brand));});renderSpecFilter();}
 function populateSpecChips(){
   const brandCategoryFn = sfTab==='gpu'?getGpuBrandCategory:getCpuBrandCategory;
   const brandCategories=[...new Set(D.map(l=>brandCategoryFn(l.spec)).filter(Boolean))].sort();
-  document.getElementById('sf-chips').innerHTML=brandCategories.map(bc=>`<button class="sf-chip-btn" data-brand="${bc}" onclick="sfToggleBrand('${bc}')">${bc}</button>`).join('');
+  const html=brandCategories.map(bc=>{
+    let color='';
+    if(bc==='NVIDIA') color='#76b900';
+    else if(bc==='AMD GPU' || bc==='AMD') color='#ed1c24';
+    else if(bc==='AMD iGPU') color='#9b6fff';
+    else if(bc==='Intel') color='#0068b5';
+    return `<button class="sf-chip-btn" data-brand="${bc}" onclick="sfToggleBrand('${bc}')" style="border: 2px solid ${color}; color: ${color}; background: rgba(${parseInt(color.slice(1,3),16)},${parseInt(color.slice(3,5),16)},${parseInt(color.slice(5,7),16)},0.08);">${bc}</button>`;
+  }).join('');
+  document.getElementById('sf-chips').innerHTML=html;
 }
 function renderSpecFilter(){
   const extFn=sfTab==='gpu'?sfExtractGpu:sfExtractCpu;
-  const scoreKey=sfTab==='gpu'?'timeSpy':'cbR23M';
-  const scoreLabel=sfTab==='gpu'?'Time Spy':'Cinebench R23 Multi';
+  const scoreKey=sfScoreMetric;
+  const scoreLabels={
+    'timeSpy':'Time Spy',
+    'tsExtreme':'TS Extreme',
+    'fsExt':'FS Extreme',
+    'fsUltra':'FS Ultra',
+    'steelNomad':'Steel Nomad',
+    'cbR23M':'CB R23 Multi',
+    'cbR24M':'CB R24 Multi',
+    'battery':'Battery',
+    'standby':'Standby'
+  };
+  const scoreLabel=scoreLabels[scoreKey]||scoreKey;
   let filtered=D.filter(l=>{
     const spec=extFn(l.spec);
     const tgp=sfExtractTgp(l.spec);
@@ -2970,8 +3040,44 @@ function renderSpecFilter(){
     const topBadge=idx===0?`<span style="display:inline-block;padding:1px 7px;border-radius:3px;font-size:11px;background:rgba(200,169,110,.15);color:var(--cyan);margin-left:6px;font-family:'JetBrains Mono',monospace">top</span>`:'';
     const brandC=bc(l.brand);
     const tgpCell=sfTab==='gpu'?`<td style="text-align:center;color:var(--muted2);font-family:'JetBrains Mono',monospace;font-size:14px">${tgp!=null?tgp+'W':'—'}</td>`:'';
-    return `<tr><td><div style="font-weight:600;font-size:15px">${l.model}${topBadge}</div><div style="font-size:13px;color:var(--muted);font-family:'JetBrains Mono',monospace">${l.brand} · ${l.year||''}</div></td><td><span style="font-family:'JetBrains Mono',monospace;font-size:12px;padding:2px 9px;border-radius:3px;border:1px solid ${brandC}44;color:${brandC};background:${brandC}11">${spec}</span></td><td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;min-width:80px"><div style="height:100%;width:${pct.toFixed(1)}%;background:var(--cyan);border-radius:3px"></div></div><span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;min-width:54px;text-align:right">${fmt(score)}</span></div></td>${tgpCell}<td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;color:${diffColor}">${diff}</td></tr>`;
+
+    // Add spec details (CUDA cores/VRAM for GPU, cores/threads for CPU)
+    let specDetail = '';
+    if (sfTab === 'gpu') {
+      const gpuMatch = Object.keys(GPU_SPECS).find(key => spec.includes(key));
+      if (gpuMatch) {
+        const specInfo = GPU_SPECS[gpuMatch];
+        specDetail = `<div style="font-size:11px;color:var(--muted);margin-top:2px;">CUDA: ${specInfo.cuda} | VRAM: ${specInfo.vram}</div>`;
+      }
+    } else {
+      const cpuMatch = Object.keys(CPU_SPECS).find(key => spec.includes(key));
+      if (cpuMatch) {
+        const specInfo = CPU_SPECS[cpuMatch];
+        specDetail = `<div style="font-size:11px;color:var(--muted);margin-top:2px;">Cores: ${specInfo.cores} | Threads: ${specInfo.threads}</div>`;
+      }
+    }
+
+    return `<tr><td><div style="font-weight:600;font-size:15px">${l.model}${topBadge}</div><div style="font-size:13px;color:var(--muted);font-family:'JetBrains Mono',monospace">${l.brand} · ${l.year||''}</div>${specDetail}</td><td><span style="font-family:'JetBrains Mono',monospace;font-size:12px;padding:2px 9px;border-radius:3px;border:1px solid ${brandC}44;color:${brandC};background:${brandC}11">${spec}</span></td><td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;min-width:80px"><div style="height:100%;width:${pct.toFixed(1)}%;background:var(--cyan);border-radius:3px"></div></div><span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;min-width:54px;text-align:right">${fmt(score)}</span></div></td>${tgpCell}<td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;color:${diffColor}">${diff}</td></tr>`;
   }).join('');
+
+  // Render score chips
+  const scoreOptions = [
+    {key:'timeSpy', label:'Time Spy'},
+    {key:'tsExtreme', label:'TS Extreme'},
+    {key:'fsExt', label:'FS Extreme'},
+    {key:'fsUltra', label:'FS Ultra'},
+    {key:'steelNomad', label:'Steel Nomad'},
+    {key:'cbR23M', label:'CB R23 Multi'},
+    {key:'cbR24M', label:'CB R24 Multi'},
+    {key:'battery', label:'Battery'},
+    {key:'standby', label:'Standby'}
+  ];
+  document.getElementById('sf-score-chips').innerHTML=scoreOptions.map(opt=>`
+    <button class="sf-score-chip${sfScoreMetric===opt.key?' active':''}"
+            data-key="${opt.key}"
+            onclick="sfSetScore(this,'${opt.key}')">
+      ${opt.label}
+    </button>`).join('');
 }
 function initSpecFilter(){populateSpecChips();renderSpecFilter();}
 // ─────────────────────────────────────────────────────────────
