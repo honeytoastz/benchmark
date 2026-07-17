@@ -123,35 +123,7 @@ tbody td.d{color:var(--muted)}
 /* ── DRAG SCROLL ── */
 .drag-scroll{cursor:grab;user-select:none}
 .drag-scroll.dragging{cursor:grabbing}
-
-.sf-chip-btn{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.06em;padding:5px 14px;border-radius:20px;border:1px solid var(--line2);background:transparent;color:var(--muted2);cursor:pointer;transition:all .15s}
-.sf-chip-btn:hover{color:var(--text)}
-.sf-chip-btn.active{background:var(--cyan);border-color:var(--cyan);color:#000;font-weight:600}
-.sf-tgp{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.06em;padding:5px 14px;border-radius:20px;border:1px solid var(--line2);background:transparent;color:var(--muted2);cursor:pointer;transition:all .15s}
-.sf-tgp:hover{color:var(--text)}
-.sf-tgp.active{background:var(--bg3);border-color:var(--muted2);color:var(--text)}
-
-
-/* Score chip styles */
-.sf-score-chip{
-  font-family:'JetBrains Mono',monospace;
-  font-size:13px;
-  letter-spacing:.06em;
-  padding:5px 14px;
-  border-radius:20px;
-  border:1px solid var(--line2);
-  background:transparent;
-  color:var(--muted2);
-  cursor:pointer;
-  transition:all .15s;
-}
-.sf-score-chip:hover{color:var(--text)}
-.sf-score-chip.active{
-  background:var(--cyan);
-  border-color:var(--cyan);
-  color:#000;
-  font-weight:600;
-}</style>
+</style>
 </head>
 <body>
 
@@ -264,38 +236,6 @@ tbody td.d{color:var(--muted)}
 </div>
 
 
-
-<div class="section" id="spec-filter">
-  <div class="section-header">
-    <span class="section-idx">06 —</span>
-    <h2 class="section-name">Spec Filter</h2>
-    <span class="section-sub">เลือก GPU หรือ CPU แล้วดูเปรียบเทียบทุกรุ่นที่ใช้สเปคนั้น</span>
-  </div>
-  <div style="display:flex;gap:.6rem;margin-bottom:1.2rem">
-    <button id="sf-tab-gpu" onclick="sfSetTab('gpu')" style="font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:.1em;text-transform:uppercase;padding:7px 20px;border-radius:3px;border:1px solid var(--cyan);background:var(--cyan);color:#000;cursor:pointer;font-weight:600">GPU</button>
-    <button id="sf-tab-cpu" onclick="sfSetTab('cpu')" style="font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:.1em;text-transform:uppercase;padding:7px 20px;border-radius:3px;border:1px solid var(--line2);background:transparent;color:var(--muted2);cursor:pointer">CPU</button>
-  </div>
-  <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem" id="sf-chip-label">เลือก GPU</div>
-  <div id="sf-chips" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.2rem"></div>
-  <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem">หมวดคะแนน</div>
-  <div style="display:flex;gap:.5rem;flex-wrap:wrap" id="sf-score-chips">
-  </div>
-  <div id="sf-tgp-wrap" style="margin-bottom:1.2rem">
-    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem">TGP (วัตต์)</div>
-    <div style="display:flex;gap:.5rem;flex-wrap:wrap" id="sf-tgp-chips">
-      <button class="sf-tgp active" data-tgp="all" onclick="sfSetTgp(this,'all')">ทั้งหมด</button>
-      <button class="sf-tgp" data-tgp="60-100" onclick="sfSetTgp(this,'60-100')">60–100W</button>
-      <button class="sf-tgp" data-tgp="100-140" onclick="sfSetTgp(this,'100-140')">100–140W</button>
-      <button class="sf-tgp" data-tgp="140+" onclick="sfSetTgp(this,'140+')">140W+</button>
-    </div>
-  </div>
-  <div id="sf-result-count" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);margin-bottom:.8rem"></div>
-  <div class="tbl-wrap" id="sf-table-wrap" style="display:none">
-    <table><thead><tr id="sf-thead"></tr></thead><tbody id="sf-tbody"></tbody></table>
-  </div>
-  <div id="sf-empty" style="padding:2rem;text-align:center;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--muted)">เลือก spec ด้านบนเพื่อดูผลเปรียบเทียบ</div>
-</div>
-
 <div class="section" id="compare">
   <div class="section-header">
     <span class="section-idx">06 —</span>
@@ -349,316 +289,2553 @@ tbody td.d{color:var(--muted)}
 </footer>
 
 <script>
-/* SPEC FILTER SECTION */
-const GPU_SPECS = {
-  'RTX 5090': {cuda:'9728', vram:'24GB GDDR7'},
-  'RTX 5080': {cuda:'7680', vram:'16GB GDDR7'},
-  'RTX 5070 Ti': {cuda:'5888', vram:'12GB GDDR7'},
-  'RTX 5070': {cuda:'4608', vram:'8GB GDDR7'},
-  'RTX 5060': {cuda:'3072', vram:'8GB GDDR7'},
-  'RTX 5050': {cuda:'2560', vram:'8GB GDDR7'},
-  'RTX 4090': {cuda:'9728', vram:'16GB GDDR6'},
-  'RTX 4080': {cuda:'7424', vram:'12GB GDDR6'},
-  'RTX 4070': {cuda:'4608', vram:'8GB GDDR6'},
-  'RTX 4060': {cuda:'3072', vram:'8GB GDDR6'},
-  'RX 8060S': {cuda:'16 CU', vram:'Unified'},
+
+const BC={ASUS:'#00d4ff',Acer:'#ff4560',Lenovo:'#ffb020',HP:'#a78bfa',Gigabyte:'#39ff84'};
+const bc=b=>BC[b]||'#8899b0';
+const getKey=l=>`${l.brand}|${l.model}|${l.spec}`;
+const N=v=>v!=null&&v!==''&&!isNaN(v)?Number(v):null;
+const fmt=(v,d=0)=>v!=null?v.toLocaleString('en-US',{maximumFractionDigits:d}):'—';
+const pct=(v,mx)=>mx?Math.round((v/mx)*100):0;
+const tcls=v=>v==null?'':v<60?'tc-cool':v<85?'tc-warm':'tc-hot';
+const tbcls=v=>v==null?'t-cool':v<60?'t-cool':v<85?'t-warm':'t-hot';
+
+const D=[
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Strix Scar 18",
+    "spec": "Core Ultra 9 275HX + RTX 5090 175W",
+    "year": 2025,
+    "timeSpy": 22882.0,
+    "tsGfx": 24315.0,
+    "tsExtreme": 11846.0,
+    "tsExtremeGfx": 11925.0,
+    "fsExt": 26919.0,
+    "fsExtGfx": 29157.0,
+    "fsExtPhys": 45105.0,
+    "fsUltra": 14817.0,
+    "fsUltraGfx": 14210.0,
+    "fsUltraPhys": 45890.0,
+    "steelNomad": 6094.0,
+    "cbR23S": 2221.0,
+    "cbR23M": 38002.0,
+    "cbR24S": 135.0,
+    "cbR24M": 2013.0,
+    "battery": 4.24,
+    "standby": 5.0,
+    "pcmark": 11019.0,
+    "pcEss": 10444.0,
+    "pcProd": 11299.0,
+    "pcCC": 13987.0,
+    "pcGaming": 24151.0,
+    "cpuIdle": 43.0,
+    "cpuLoad": 105.0,
+    "gpuIdle": 45.0,
+    "gpuLoad": 76.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Strix Scar 18",
+    "spec": "Core Ultra 9 290HX Plus + RTX 5090 175W",
+    "year": 2026,
+    "timeSpy": 23983.0,
+    "tsGfx": 25254.0,
+    "tsExtreme": 12534.0,
+    "tsExtremeGfx": 12382.0,
+    "fsExt": 30358.0,
+    "fsExtGfx": 32288.0,
+    "fsExtPhys": 52336.0,
+    "fsUltra": 16901.0,
+    "fsUltraGfx": 16489.0,
+    "fsUltraPhys": 51172.0,
+    "steelNomad": 6318.0,
+    "cbR23S": 2361.0,
+    "cbR23M": 40302.0,
+    "cbR24S": 138.0,
+    "cbR24M": 2253.0,
+    "battery": 4.25,
+    "standby": 9.48,
+    "pcmark": 15496.0,
+    "pcEss": 11346.0,
+    "pcProd": 19199.0,
+    "pcCC": 20074.0,
+    "pcGaming": 35631.0,
+    "cpuIdle": 40.0,
+    "cpuLoad": 104.0,
+    "gpuIdle": 37.0,
+    "gpuLoad": 66.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Strix G16",
+    "spec": "Ryzen 9955HX + RTX 5070 12GB 175W",
+    "year": 2026,
+    "timeSpy": 13834.0,
+    "tsGfx": 14145.0,
+    "tsExtreme": 7002.0,
+    "tsExtremeGfx": 6579.0,
+    "fsExt": 17580.0,
+    "fsExtGfx": 17826.0,
+    "fsExtPhys": 42570.0,
+    "fsUltra": 8736.0,
+    "fsUltraGfx": 8394.0,
+    "fsUltraPhys": 42584.0,
+    "steelNomad": 3209.0,
+    "cbR23S": 2161.0,
+    "cbR23M": 39482.0,
+    "cbR24S": 127.0,
+    "cbR24M": 1880.0,
+    "battery": 6.06,
+    "standby": 9.26,
+    "pcmark": 14199.0,
+    "pcEss": 10844.0,
+    "pcProd": 23081.0,
+    "pcCC": 15350.0,
+    "pcGaming": 28586.0,
+    "cpuIdle": 37.0,
+    "cpuLoad": 94.0,
+    "gpuIdle": 38.0,
+    "gpuLoad": 72.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Zephyrus DUO",
+    "spec": "Core Ultra 9 386H + RTX 5090 150W",
+    "year": 2026,
+    "timeSpy": 21035.0,
+    "tsGfx": 22417.0,
+    "tsExtreme": 10410.0,
+    "tsExtremeGfx": 11162.0,
+    "fsExt": 26055.0,
+    "fsExtGfx": 28053.0,
+    "fsExtPhys": 32207.0,
+    "fsUltra": 14579.0,
+    "fsUltraGfx": 14662.0,
+    "fsUltraPhys": 30216.0,
+    "steelNomad": 5769.0,
+    "cbR23S": 2081.0,
+    "cbR23M": 21554.0,
+    "cbR24S": 124.0,
+    "cbR24M": 1225.0,
+    "battery": 15.15,
+    "standby": 18.05,
+    "pcmark": 12814.0,
+    "pcEss": 10010.0,
+    "pcProd": 14210.0,
+    "pcCC": 16059.0,
+    "pcGaming": 31897.0,
+    "cpuIdle": 38.0,
+    "cpuLoad": 96.0,
+    "gpuIdle": 40.0,
+    "gpuLoad": 78.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Strix Scar 16",
+    "spec": "Core Ultra 9 275HX + RTX 5080 175W",
+    "year": 2025,
+    "timeSpy": 20717.0,
+    "tsGfx": 21512.0,
+    "tsExtreme": 10636.0,
+    "tsExtremeGfx": 10359.0,
+    "fsExt": 22218.0,
+    "fsExtGfx": 22312.0,
+    "fsExtPhys": 48285.0,
+    "fsUltra": 12473.0,
+    "fsUltraGfx": 11671.0,
+    "fsUltraPhys": 46605.0,
+    "steelNomad": 5082.0,
+    "cbR23S": 2182.0,
+    "cbR23M": 37953.0,
+    "cbR24S": 133.0,
+    "cbR24M": 2134.0,
+    "battery": 2.56,
+    "standby": 6.23,
+    "pcmark": 12217.0,
+    "pcEss": 10684.0,
+    "pcProd": 10776.0,
+    "pcCC": 18205.0,
+    "pcGaming": 28728.0,
+    "cpuIdle": 48.0,
+    "cpuLoad": 100.0,
+    "gpuIdle": 48.0,
+    "gpuLoad": 83.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Strix G18",
+    "spec": "Core Ultra 9 275HX + RTX 5080 175W",
+    "year": 2025,
+    "timeSpy": 20283.0,
+    "tsGfx": 21641.0,
+    "tsExtreme": 10562.0,
+    "tsExtremeGfx": 10569.0,
+    "fsExt": 23722.0,
+    "fsExtGfx": 24660.0,
+    "fsExtPhys": 45164.0,
+    "fsUltra": 13537.0,
+    "fsUltraGfx": 12933.0,
+    "fsUltraPhys": 46800.0,
+    "steelNomad": 5113.0,
+    "cbR23S": 2216.0,
+    "cbR23M": 37911.0,
+    "cbR24S": 135.0,
+    "cbR24M": 1648.0,
+    "battery": 6.35,
+    "standby": 13.23,
+    "pcmark": 12476.0,
+    "pcEss": 11190.0,
+    "pcProd": 10706.0,
+    "pcCC": 18140.0,
+    "pcGaming": 30127.0,
+    "cpuIdle": 59.0,
+    "cpuLoad": 100.0,
+    "gpuIdle": 52.0,
+    "gpuLoad": 80.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Strix G16",
+    "spec": "Ryzen 9 9955HX3D + RTX 5070 Ti 140W",
+    "year": 2025,
+    "timeSpy": 16297.0,
+    "tsGfx": 17730.0,
+    "tsExtreme": 8726.0,
+    "tsExtremeGfx": 8554.0,
+    "fsExt": 20379.0,
+    "fsExtGfx": 20970.0,
+    "fsExtPhys": 31524.0,
+    "fsUltra": 11384.0,
+    "fsUltraGfx": 11136.0,
+    "fsUltraPhys": 32574.0,
+    "steelNomad": 4079.0,
+    "cbR23S": 2192.0,
+    "cbR23M": 39065.0,
+    "cbR24S": 129.0,
+    "cbR24M": 2115.0,
+    "battery": 3.24,
+    "standby": 5.51,
+    "pcmark": 13243.0,
+    "pcEss": 11864.0,
+    "pcProd": 11414.0,
+    "pcCC": 18556.0,
+    "pcGaming": 33059.0,
+    "cpuIdle": 58.0,
+    "cpuLoad": 85.0,
+    "gpuIdle": 46.0,
+    "gpuLoad": 75.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Strix G16",
+    "spec": "Core Ultra 9 275HX + RTX 5070 8GB 115W",
+    "year": 2025,
+    "timeSpy": 14469.0,
+    "tsGfx": 14170.0,
+    "tsExtreme": 6953.0,
+    "tsExtremeGfx": 6504.0,
+    "fsExt": 16413.0,
+    "fsExtGfx": 16211.0,
+    "fsExtPhys": 45680.0,
+    "fsUltra": 8749.0,
+    "fsUltraGfx": 8402.0,
+    "fsUltraPhys": 45817.0,
+    "steelNomad": 3192.0,
+    "cbR23S": 2190.0,
+    "cbR23M": 36107.0,
+    "cbR24S": 133.0,
+    "cbR24M": 1644.0,
+    "battery": 6.44,
+    "standby": 8.34,
+    "pcmark": 12065.0,
+    "pcEss": 11293.0,
+    "pcProd": 11101.0,
+    "pcCC": 16988.0,
+    "pcGaming": 26885.0,
+    "cpuIdle": 48.0,
+    "cpuLoad": 102.0,
+    "gpuIdle": 47.0,
+    "gpuLoad": 75.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Zephyrus G16",
+    "spec": "Ryzen AI 7 350 + RTX 5060 105W",
+    "year": 2025,
+    "timeSpy": 11492.0,
+    "tsGfx": 11797.0,
+    "tsExtreme": 5491.0,
+    "tsExtremeGfx": 5435.0,
+    "fsExt": 14250.0,
+    "fsExtGfx": 14788.0,
+    "fsExtPhys": 28930.0,
+    "fsUltra": 7315.0,
+    "fsUltraGfx": 7089.0,
+    "fsUltraPhys": 29027.0,
+    "steelNomad": 2554.0,
+    "cbR23S": 1936.0,
+    "cbR23M": 17579.0,
+    "cbR24S": 114.0,
+    "cbR24M": 943.0,
+    "battery": 10.0,
+    "standby": 12.0,
+    "pcmark": 10291.0,
+    "pcEss": 10171.0,
+    "pcProd": 10690.0,
+    "pcCC": 12234.0,
+    "pcGaming": 22783.0,
+    "cpuIdle": 53.0,
+    "cpuLoad": 95.0,
+    "gpuIdle": 52.0,
+    "gpuLoad": 83.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Zephyrus G14",
+    "spec": "Ryzen 9 8945HS + RTX 4050 80W",
+    "year": 2024,
+    "timeSpy": 10210.0,
+    "tsGfx": 10093.0,
+    "tsExtreme": 4850.0,
+    "tsExtremeGfx": 4714.0,
+    "fsExt": 11481.0,
+    "fsExtGfx": 11856.0,
+    "fsExtPhys": 30115.0,
+    "fsUltra": 5929.0,
+    "fsUltraGfx": 5724.0,
+    "fsUltraPhys": 30199.0,
+    "steelNomad": null,
+    "cbR23S": 1808.0,
+    "cbR23M": 17310.0,
+    "cbR24S": 103.0,
+    "cbR24M": 939.0,
+    "battery": 3.52,
+    "standby": 3.21,
+    "pcmark": 10200.0,
+    "pcEss": 10696.0,
+    "pcProd": 10349.0,
+    "pcCC": 13007.0,
+    "pcGaming": 20319.0,
+    "cpuIdle": 52.0,
+    "cpuLoad": 95.0,
+    "gpuIdle": 45.0,
+    "gpuLoad": 86.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Flow Z13",
+    "spec": "Ryzen AI Max+ 395 + RX 8060S 55W",
+    "year": 2025,
+    "timeSpy": 10548.0,
+    "tsGfx": 10505.0,
+    "tsExtreme": 5196.0,
+    "tsExtremeGfx": 4787.0,
+    "fsExt": 12309.0,
+    "fsExtGfx": 12839.0,
+    "fsExtPhys": 38281.0,
+    "fsUltra": 6671.0,
+    "fsUltraGfx": 6535.0,
+    "fsUltraPhys": 38635.0,
+    "steelNomad": 2027.0,
+    "cbR23S": 2023.0,
+    "cbR23M": 32151.0,
+    "cbR24S": 114.0,
+    "cbR24M": 1611.0,
+    "battery": 9.07,
+    "standby": 11.37,
+    "pcmark": 11246.0,
+    "pcEss": 11980.0,
+    "pcProd": 10903.0,
+    "pcCC": 16780.0,
+    "pcGaming": 19724.0,
+    "cpuIdle": 45.0,
+    "cpuLoad": 79.0,
+    "gpuIdle": 45.0,
+    "gpuLoad": 79.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Strix G16",
+    "spec": "Ryzen 9 8940HX + RTX 5050 115W",
+    "year": 2025,
+    "timeSpy": 10204.0,
+    "tsGfx": 9992.0,
+    "tsExtreme": 5020.0,
+    "tsExtremeGfx": 4625.0,
+    "fsExt": 12294.0,
+    "fsExtGfx": 12307.0,
+    "fsExtPhys": 38558.0,
+    "fsUltra": 6256.0,
+    "fsUltraGfx": 5965.0,
+    "fsUltraPhys": 38092.0,
+    "steelNomad": 2253.0,
+    "cbR23S": 1917.0,
+    "cbR23M": 34287.0,
+    "cbR24S": 113.0,
+    "cbR24M": 1471.0,
+    "battery": 4.16,
+    "standby": 7.11,
+    "pcmark": 10405.0,
+    "pcEss": 10212.0,
+    "pcProd": 10364.0,
+    "pcCC": 13823.0,
+    "pcGaming": 21648.0,
+    "cpuIdle": 59.0,
+    "cpuLoad": 95.0,
+    "gpuIdle": 43.0,
+    "gpuLoad": 80.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Zephyrus G14",
+    "spec": "Ryzen AI 9 465 + RTX 5060 TGP 100W",
+    "year": 2026,
+    "timeSpy": 10965.0,
+    "tsGfx": 11224.0,
+    "tsExtreme": 5451.0,
+    "tsExtremeGfx": 5343.0,
+    "fsExt": 14124.0,
+    "fsExtGfx": 14442.0,
+    "fsExtPhys": 30689.0,
+    "fsUltra": 6924.0,
+    "fsUltraGfx": 6707.0,
+    "fsUltraPhys": 30267.0,
+    "steelNomad": 2468.0,
+    "cbR23S": 1937.0,
+    "cbR23M": 20600.0,
+    "cbR24S": 111.0,
+    "cbR24M": 1068.0,
+    "battery": 10.43,
+    "standby": 20.39,
+    "pcmark": 11511.0,
+    "pcEss": 9404.0,
+    "pcProd": 17651.0,
+    "pcCC": 12738.0,
+    "pcGaming": 22441.0,
+    "cpuIdle": 41.0,
+    "cpuLoad": 95.0,
+    "gpuIdle": 42.0,
+    "gpuLoad": 83.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Zephyrus G16",
+    "spec": "Core Ultra 9 285H + RTX 5080 120W",
+    "year": 2025,
+    "timeSpy": 15793.0,
+    "tsGfx": null,
+    "tsExtreme": 8210.0,
+    "tsExtremeGfx": null,
+    "fsExt": 18646.0,
+    "fsExtGfx": null,
+    "fsExtPhys": null,
+    "fsUltra": 10934.0,
+    "fsUltraGfx": null,
+    "fsUltraPhys": null,
+    "steelNomad": null,
+    "cbR23S": null,
+    "cbR23M": null,
+    "cbR24S": null,
+    "cbR24M": null,
+    "battery": null,
+    "standby": null,
+    "pcmark": null,
+    "pcEss": null,
+    "pcProd": null,
+    "pcCC": null,
+    "pcGaming": null,
+    "cpuIdle": null,
+    "cpuLoad": null,
+    "gpuIdle": null,
+    "gpuLoad": null
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Zephyrus G16",
+    "spec": "Core Ultra 9 386H + RTX 5080 160W",
+    "year": 2026,
+    "timeSpy": 19063.0,
+    "tsGfx": 19977.0,
+    "tsExtreme": 9319.0,
+    "tsExtremeGfx": 9789.0,
+    "fsExt": 22806.0,
+    "fsExtGfx": 24557.0,
+    "fsExtPhys": 29853.0,
+    "fsUltra": 12310.0,
+    "fsUltraGfx": 12255.0,
+    "fsUltraPhys": 29836.0,
+    "steelNomad": 4840.0,
+    "cbR23S": 2036.0,
+    "cbR23M": 21588.0,
+    "cbR24S": 124.0,
+    "cbR24M": 1256.0,
+    "battery": 12.05,
+    "standby": 24.07,
+    "pcmark": 12633.0,
+    "pcEss": 9977.0,
+    "pcProd": 15159.0,
+    "pcCC": 15884.0,
+    "pcGaming": 28650.0,
+    "cpuIdle": 35.0,
+    "cpuLoad": 96.0,
+    "gpuIdle": 37.0,
+    "gpuLoad": 86.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Zephyrus G16",
+    "spec": "Core Ultra 9 386H + RTX 5070 Ti 140W",
+    "year": 2026,
+    "timeSpy": 16924.0,
+    "tsGfx": 17188.0,
+    "tsExtreme": 8063.0,
+    "tsExtremeGfx": 8198.0,
+    "fsExt": 20653.0,
+    "fsExtGfx": 21904.0,
+    "fsExtPhys": 30533.0,
+    "fsUltra": 10969.0,
+    "fsUltraGfx": 10743.0,
+    "fsUltraPhys": 30245.0,
+    "steelNomad": 3870.0,
+    "cbR23S": 2033.0,
+    "cbR23M": 21651.0,
+    "cbR24S": 124.0,
+    "cbR24M": 1263.0,
+    "battery": 11.43,
+    "standby": 24.24,
+    "pcmark": 12579.0,
+    "pcEss": 10152.0,
+    "pcProd": 15170.0,
+    "pcCC": 15663.0,
+    "pcGaming": 28048.0,
+    "cpuIdle": 37.0,
+    "cpuLoad": 96.0,
+    "gpuIdle": 41.0,
+    "gpuLoad": 83.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "TUF & V16",
+    "model": "TUF F16",
+    "spec": "I5-13450HX + RTX 5060 115W",
+    "year": 2025,
+    "timeSpy": 12433.0,
+    "tsGfx": 12544.0,
+    "tsExtreme": 5800.0,
+    "tsExtremeGfx": 5834.0,
+    "fsExt": 14848.0,
+    "fsExtGfx": 15165.0,
+    "fsExtPhys": 28988.0,
+    "fsUltra": 7531.0,
+    "fsUltraGfx": 7268.0,
+    "fsUltraPhys": 29124.0,
+    "steelNomad": 2621.0,
+    "cbR23S": 1679.0,
+    "cbR23M": 16397.0,
+    "cbR24S": 100.0,
+    "cbR24M": 898.0,
+    "battery": 7.5,
+    "standby": 8.22,
+    "pcmark": 8978.0,
+    "pcEss": 9643.0,
+    "pcProd": 6909.0,
+    "pcCC": 12702.0,
+    "pcGaming": 20751.0,
+    "cpuIdle": 45.0,
+    "cpuLoad": 94.0,
+    "gpuIdle": 40.0,
+    "gpuLoad": 76.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "TUF & V16",
+    "model": "TUF F16",
+    "spec": "i7-13650HX + RTX 4050 130W",
+    "year": 2024,
+    "timeSpy": 11407.0,
+    "tsGfx": 11182.0,
+    "tsExtreme": 5428.0,
+    "tsExtremeGfx": 5245.0,
+    "fsExt": 12379.0,
+    "fsExtGfx": 12913.0,
+    "fsExtPhys": 28755.0,
+    "fsUltra": 6387.0,
+    "fsUltraGfx": 6240.0,
+    "fsUltraPhys": 27898.0,
+    "steelNomad": null,
+    "cbR23S": 1830.0,
+    "cbR23M": 18495.0,
+    "cbR24S": null,
+    "cbR24M": null,
+    "battery": 5.29,
+    "standby": 6.57,
+    "pcmark": 7882.0,
+    "pcEss": 10639.0,
+    "pcProd": 9767.0,
+    "pcCC": 12789.0,
+    "pcGaming": null,
+    "cpuIdle": 55.0,
+    "cpuLoad": 97.0,
+    "gpuIdle": 46.0,
+    "gpuLoad": 84.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "TUF & V16",
+    "model": "TUF A16",
+    "spec": "Ryzen AI 9 HX 370 + RTX 4060 140W",
+    "year": 2024,
+    "timeSpy": 10772.0,
+    "tsGfx": 10888.0,
+    "tsExtreme": 5293.0,
+    "tsExtremeGfx": 5071.0,
+    "fsExt": 12197.0,
+    "fsExtGfx": 12754.0,
+    "fsExtPhys": 29409.0,
+    "fsUltra": 6250.0,
+    "fsUltraGfx": 6053.0,
+    "fsUltraPhys": 28528.0,
+    "steelNomad": 2391.0,
+    "cbR23S": 1628.0,
+    "cbR23M": 23362.0,
+    "cbR24S": 98.0,
+    "cbR24M": 1170.0,
+    "battery": 10.41,
+    "standby": 11.49,
+    "pcmark": 7442.0,
+    "pcEss": 9417.0,
+    "pcProd": 9145.0,
+    "pcCC": 12990.0,
+    "pcGaming": null,
+    "cpuIdle": 41.0,
+    "cpuLoad": 95.0,
+    "gpuIdle": 38.0,
+    "gpuLoad": 84.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "TUF & V16",
+    "model": "TUF A18",
+    "spec": "Ryzen 7 260 + RTX 5050 115W",
+    "year": 2025,
+    "timeSpy": 10414.0,
+    "tsGfx": 10350.0,
+    "tsExtreme": 4939.0,
+    "tsExtremeGfx": 4801.0,
+    "fsExt": 12167.0,
+    "fsExtGfx": 12392.0,
+    "fsExtPhys": 29868.0,
+    "fsUltra": 6367.0,
+    "fsUltraGfx": 6168.0,
+    "fsUltraPhys": 30025.0,
+    "steelNomad": 2186.0,
+    "cbR23S": 1780.0,
+    "cbR23M": 17643.0,
+    "cbR24S": 104.0,
+    "cbR24M": 1006.0,
+    "battery": 11.51,
+    "standby": 12.0,
+    "pcmark": 10189.0,
+    "pcEss": 10329.0,
+    "pcProd": 10141.0,
+    "pcCC": 13014.0,
+    "pcGaming": 21368.0,
+    "cpuIdle": 42.0,
+    "cpuLoad": 95.0,
+    "gpuIdle": 38.0,
+    "gpuLoad": 81.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "TUF & V16",
+    "model": "TUF F16",
+    "spec": "i5-14450HX + RTX 5050 115W",
+    "year": 2025,
+    "timeSpy": 10259.0,
+    "tsGfx": 9929.0,
+    "tsExtreme": 4744.0,
+    "tsExtremeGfx": 4606.0,
+    "fsExt": 11903.0,
+    "fsExtGfx": 12029.0,
+    "fsExtPhys": 30721.0,
+    "fsUltra": 6207.0,
+    "fsUltraGfx": 5986.0,
+    "fsUltraPhys": 29481.0,
+    "steelNomad": 2328.0,
+    "cbR23S": 1816.0,
+    "cbR23M": 16385.0,
+    "cbR24S": 107.0,
+    "cbR24M": 910.0,
+    "battery": 8.05,
+    "standby": 18.37,
+    "pcmark": 8884.0,
+    "pcEss": 9900.0,
+    "pcProd": 7546.0,
+    "pcCC": 11439.0,
+    "pcGaming": 19697.0,
+    "cpuIdle": 55.0,
+    "cpuLoad": 97.0,
+    "gpuIdle": 41.0,
+    "gpuLoad": 81.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "TUF & V16",
+    "model": "Gaming V16",
+    "spec": "Core 7 240H + RTX 5070 75W",
+    "year": 2025,
+    "timeSpy": 11196.0,
+    "tsGfx": 11094.0,
+    "tsExtreme": 5172.0,
+    "tsExtremeGfx": 5153.0,
+    "fsExt": 13539.0,
+    "fsExtGfx": 14264.0,
+    "fsExtPhys": 27382.0,
+    "fsUltra": 6936.0,
+    "fsUltraGfx": 6781.0,
+    "fsUltraPhys": 27434.0,
+    "steelNomad": 2495.0,
+    "cbR23S": 1890.0,
+    "cbR23M": 15173.0,
+    "cbR24S": 110.0,
+    "cbR24M": 725.0,
+    "battery": 6.27,
+    "standby": 10.0,
+    "pcmark": 9101.0,
+    "pcEss": 10572.0,
+    "pcProd": 8161.0,
+    "pcCC": 11598.0,
+    "pcGaming": 18523.0,
+    "cpuIdle": 56.0,
+    "cpuLoad": 96.0,
+    "gpuIdle": 57.0,
+    "gpuLoad": 80.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "TUF & V16",
+    "model": "Gaming V16",
+    "spec": "Core 5 210H + 5050 75W",
+    "year": 2025,
+    "timeSpy": 7743.0,
+    "tsGfx": 7560.0,
+    "tsExtreme": 3722.0,
+    "tsExtremeGfx": 3658.0,
+    "fsExt": 9732.0,
+    "fsExtGfx": 10213.0,
+    "fsExtPhys": 24302.0,
+    "fsUltra": 4970.0,
+    "fsUltraGfx": 4814.0,
+    "fsUltraPhys": 24229.0,
+    "steelNomad": 1649.0,
+    "cbR23S": 1723.0,
+    "cbR23M": 11549.0,
+    "cbR24S": 100.0,
+    "cbR24M": 651.0,
+    "battery": 7.29,
+    "standby": 9.4,
+    "pcmark": 7666.0,
+    "pcEss": 9471.0,
+    "pcProd": 6870.0,
+    "pcCC": 9292.0,
+    "pcGaming": 15441.0,
+    "cpuIdle": 56.0,
+    "cpuLoad": 96.0,
+    "gpuIdle": 55.0,
+    "gpuLoad": 85.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "TUF & V16",
+    "model": "Gaming V16",
+    "spec": "Core 7 240H + RTX 4050 65W",
+    "year": 2025,
+    "timeSpy": 7055.0,
+    "tsGfx": 6597.0,
+    "tsExtreme": 3224.0,
+    "tsExtremeGfx": 3044.0,
+    "fsExt": 8129.0,
+    "fsExtGfx": 8457.0,
+    "fsExtPhys": 27637.0,
+    "fsUltra": 3999.0,
+    "fsUltraGfx": 3818.0,
+    "fsUltraPhys": 28411.0,
+    "steelNomad": null,
+    "cbR23S": 1915.0,
+    "cbR23M": 14741.0,
+    "cbR24S": 114.0,
+    "cbR24M": 825.0,
+    "battery": 7.39,
+    "standby": 9.12,
+    "pcmark": 6867.0,
+    "pcEss": 9207.0,
+    "pcProd": 9170.0,
+    "pcCC": 10409.0,
+    "pcGaming": null,
+    "cpuIdle": null,
+    "cpuLoad": 96.0,
+    "gpuIdle": null,
+    "gpuLoad": 75.0
+  },
+  {
+    "brand": "Acer",
+    "series": "Predator",
+    "model": "Helios 16",
+    "spec": "i9-14900HX + RTX 4080 175W",
+    "year": 2024,
+    "timeSpy": 17828.0,
+    "tsGfx": 19063.0,
+    "tsExtreme": 8987.0,
+    "tsExtremeGfx": 9003.0,
+    "fsExt": null,
+    "fsExtGfx": null,
+    "fsExtPhys": null,
+    "fsUltra": null,
+    "fsUltraGfx": null,
+    "fsUltraPhys": null,
+    "steelNomad": null,
+    "cbR23S": 2149.0,
+    "cbR23M": 30131.0,
+    "cbR24S": 126.0,
+    "cbR24M": 1361.0,
+    "battery": null,
+    "standby": 3.48,
+    "pcmark": 9369.0,
+    "pcEss": 11138.0,
+    "pcProd": 12995.0,
+    "pcCC": 15550.0,
+    "pcGaming": null,
+    "cpuIdle": 69.0,
+    "cpuLoad": 100.0,
+    "gpuIdle": 51.0,
+    "gpuLoad": 87.0
+  },
+  {
+    "brand": "Acer",
+    "series": "Predator",
+    "model": "Helios Neo 16",
+    "spec": "i9-14900HX + RTX 4070 140W",
+    "year": 2024,
+    "timeSpy": 12804.0,
+    "tsGfx": 13099.0,
+    "tsExtreme": 6087.0,
+    "tsExtremeGfx": 5962.0,
+    "fsExt": 14112.0,
+    "fsExtGfx": 14920.0,
+    "fsExtPhys": 27467.0,
+    "fsUltra": 7238.0,
+    "fsUltraGfx": 7052.0,
+    "fsUltraPhys": 28110.0,
+    "steelNomad": 2828.0,
+    "cbR23S": null,
+    "cbR23M": null,
+    "cbR24S": null,
+    "cbR24M": null,
+    "battery": null,
+    "standby": 3.48,
+    "pcmark": null,
+    "pcEss": null,
+    "pcProd": null,
+    "pcCC": null,
+    "pcGaming": null,
+    "cpuIdle": 50.0,
+    "cpuLoad": 100.0,
+    "gpuIdle": 46.0,
+    "gpuLoad": 86.0
+  },
+  {
+    "brand": "Acer",
+    "series": "Predator",
+    "model": "Helios Neo 16",
+    "spec": "i7-14700HX + RTX 4070 140W",
+    "year": 2024,
+    "timeSpy": 12281.0,
+    "tsGfx": 12672.0,
+    "tsExtreme": 6053.0,
+    "tsExtremeGfx": 5840.0,
+    "fsExt": null,
+    "fsExtGfx": null,
+    "fsExtPhys": null,
+    "fsUltra": 6769.0,
+    "fsUltraGfx": 6645.0,
+    "fsUltraPhys": 24147.0,
+    "steelNomad": null,
+    "cbR23S": 2136.0,
+    "cbR23M": 25307.0,
+    "cbR24S": null,
+    "cbR24M": null,
+    "battery": null,
+    "standby": null,
+    "pcmark": null,
+    "pcEss": null,
+    "pcProd": null,
+    "pcCC": null,
+    "pcGaming": null,
+    "cpuIdle": null,
+    "cpuLoad": null,
+    "gpuIdle": null,
+    "gpuLoad": null
+  },
+  {
+    "brand": "Acer",
+    "series": "Nitro",
+    "model": "Nitro V 16S AI",
+    "spec": "Ryzen 7 260 + RTX 5060 85W",
+    "year": 2025,
+    "timeSpy": 11007.0,
+    "tsGfx": 11216.0,
+    "tsExtreme": 5166.0,
+    "tsExtremeGfx": 5177.0,
+    "fsExt": 14239.0,
+    "fsExtGfx": 14873.0,
+    "fsExtPhys": 26866.0,
+    "fsUltra": 7045.0,
+    "fsUltraGfx": 6867.0,
+    "fsUltraPhys": 26741.0,
+    "steelNomad": 2389.0,
+    "cbR23S": 1774.0,
+    "cbR23M": 15798.0,
+    "cbR24S": 104.0,
+    "cbR24M": 837.0,
+    "battery": 7.5,
+    "standby": 10.0,
+    "pcmark": 10337.0,
+    "pcEss": 10109.0,
+    "pcProd": 10532.0,
+    "pcCC": 12788.0,
+    "pcGaming": 22661.0,
+    "cpuIdle": 47.0,
+    "cpuLoad": 82.0,
+    "gpuIdle": 45.0,
+    "gpuLoad": 77.0
+  },
+  {
+    "brand": "Acer",
+    "series": "Nitro",
+    "model": "Nitro 16",
+    "spec": "Ryzen 9 8945HS + RTX 4060 115W",
+    "year": 2024,
+    "timeSpy": 11019.0,
+    "tsGfx": 10877.0,
+    "tsExtreme": 5816.0,
+    "tsExtremeGfx": 5060.0,
+    "fsExt": 11942.0,
+    "fsExtGfx": 12309.0,
+    "fsExtPhys": 29789.0,
+    "fsUltra": 6398.0,
+    "fsUltraGfx": 6220.0,
+    "fsUltraPhys": 29597.0,
+    "steelNomad": 2335.0,
+    "cbR23S": 1803.0,
+    "cbR23M": 17770.0,
+    "cbR24S": 106.0,
+    "cbR24M": 987.0,
+    "battery": 4.4,
+    "standby": 5.5,
+    "pcmark": 7707.0,
+    "pcEss": 10240.0,
+    "pcProd": 10277.0,
+    "pcCC": 11805.0,
+    "pcGaming": null,
+    "cpuIdle": 47.0,
+    "cpuLoad": 98.0,
+    "gpuIdle": 42.0,
+    "gpuLoad": 77.0
+  },
+  {
+    "brand": "Acer",
+    "series": "Nitro",
+    "model": "Nitro V 14",
+    "spec": "Ryzen 5 8645HS + RTX 4050 60W",
+    "year": 2024,
+    "timeSpy": 7469.0,
+    "tsGfx": 7315.0,
+    "tsExtreme": 3501.0,
+    "tsExtremeGfx": 3400.0,
+    "fsExt": 8766.0,
+    "fsExtGfx": 9075.0,
+    "fsExtPhys": 23199.0,
+    "fsUltra": 4163.0,
+    "fsUltraGfx": 3939.0,
+    "fsUltraPhys": 23306.0,
+    "steelNomad": null,
+    "cbR23S": 1707.0,
+    "cbR23M": 12516.0,
+    "cbR24S": null,
+    "cbR24M": null,
+    "battery": 6.01,
+    "standby": 7.44,
+    "pcmark": 7046.0,
+    "pcEss": 9837.0,
+    "pcProd": 9696.0,
+    "pcCC": 9953.0,
+    "pcGaming": null,
+    "cpuIdle": 53.0,
+    "cpuLoad": 100.0,
+    "gpuIdle": 42.0,
+    "gpuLoad": 73.0
+  },
+  {
+    "brand": "Acer",
+    "series": "Nitro",
+    "model": "Nitro V 15",
+    "spec": "Ryzen 5 7535HS + RTX 2050 65W",
+    "year": 2024,
+    "timeSpy": 4354.0,
+    "tsGfx": 4101.0,
+    "tsExtreme": 2006.0,
+    "tsExtremeGfx": 1861.0,
+    "fsExt": 4829.0,
+    "fsExtGfx": 4973.0,
+    "fsExtPhys": 20004.0,
+    "fsUltra": null,
+    "fsUltraGfx": null,
+    "fsUltraPhys": null,
+    "steelNomad": null,
+    "cbR23S": 1416.0,
+    "cbR23M": 10110.0,
+    "cbR24S": null,
+    "cbR24M": null,
+    "battery": 4.44,
+    "standby": 5.55,
+    "pcmark": 5776.0,
+    "pcEss": 8859.0,
+    "pcProd": 8310.0,
+    "pcCC": 7107.0,
+    "pcGaming": null,
+    "cpuIdle": null,
+    "cpuLoad": null,
+    "gpuIdle": null,
+    "gpuLoad": 70.0
+  },
+  {
+    "brand": "Acer",
+    "series": "Nitro",
+    "model": "Nitro Lite 16",
+    "spec": "i5-13420H + RTX 4050 55W",
+    "year": 2024,
+    "timeSpy": 6456.0,
+    "tsGfx": 6722.0,
+    "tsExtreme": 3134.0,
+    "tsExtremeGfx": 3160.0,
+    "fsExt": 8229.0,
+    "fsExtGfx": 8648.0,
+    "fsExtPhys": 22363.0,
+    "fsUltra": 4061.0,
+    "fsUltraGfx": 3929.0,
+    "fsUltraPhys": 19400.0,
+    "steelNomad": 1492.0,
+    "cbR23S": 1670.0,
+    "cbR23M": 8940.0,
+    "cbR24S": 100.0,
+    "cbR24M": 480.0,
+    "battery": 6.52,
+    "standby": 9.38,
+    "pcmark": 6599.0,
+    "pcEss": 9570.0,
+    "pcProd": 9169.0,
+    "pcCC": 8887.0,
+    "pcGaming": null,
+    "cpuIdle": 50.0,
+    "cpuLoad": null,
+    "gpuIdle": 45.0,
+    "gpuLoad": 72.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "Legion",
+    "model": "Legion 9i Gen 9",
+    "spec": "i9-14900HX + RTX 4090 175W",
+    "year": 2024,
+    "timeSpy": null,
+    "tsGfx": null,
+    "tsExtreme": null,
+    "tsExtremeGfx": null,
+    "fsExt": null,
+    "fsExtGfx": null,
+    "fsExtPhys": null,
+    "fsUltra": null,
+    "fsUltraGfx": null,
+    "fsUltraPhys": null,
+    "steelNomad": null,
+    "cbR23S": null,
+    "cbR23M": null,
+    "cbR24S": null,
+    "cbR24M": null,
+    "battery": null,
+    "standby": null,
+    "pcmark": 8918.0,
+    "pcEss": 11460.0,
+    "pcProd": 11146.0,
+    "pcCC": 15071.0,
+    "pcGaming": null,
+    "cpuIdle": 54.0,
+    "cpuLoad": 90.0,
+    "gpuIdle": 43.0,
+    "gpuLoad": 71.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "Legion",
+    "model": "Legion Pro 7i Gen 10",
+    "spec": "Core Ultra 9 275HX + RTX 5070 Ti 140W",
+    "year": 2025,
+    "timeSpy": 14608.0,
+    "tsGfx": 14155.0,
+    "tsExtreme": 6992.0,
+    "tsExtremeGfx": 6500.0,
+    "fsExt": 17358.0,
+    "fsExtGfx": 17340.0,
+    "fsExtPhys": 48863.0,
+    "fsUltra": 8864.0,
+    "fsUltraGfx": 8451.0,
+    "fsUltraPhys": 48839.0,
+    "steelNomad": 3099.0,
+    "cbR23S": 1339.0,
+    "cbR23M": 38502.0,
+    "cbR24S": 133.0,
+    "cbR24M": 2211.0,
+    "battery": 5.32,
+    "standby": 9.56,
+    "pcmark": 13143.0,
+    "pcEss": 10517.0,
+    "pcProd": 15244.0,
+    "pcCC": 18142.0,
+    "pcGaming": 27717.0,
+    "cpuIdle": 49.0,
+    "cpuLoad": 105.0,
+    "gpuIdle": 42.0,
+    "gpuLoad": 72.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "Legion",
+    "model": "Legion Pro 7i Gen 10 FiFa",
+    "spec": "Core Ultra 9 275HX + RTX 5070 Ti 140W",
+    "year": 2026,
+    "timeSpy": null,
+    "tsGfx": null,
+    "tsExtreme": null,
+    "tsExtremeGfx": null,
+    "fsExt": null,
+    "fsExtGfx": null,
+    "fsExtPhys": null,
+    "fsUltra": null,
+    "fsUltraGfx": null,
+    "fsUltraPhys": null,
+    "steelNomad": null,
+    "cbR23S": null,
+    "cbR23M": null,
+    "cbR24S": null,
+    "cbR24M": null,
+    "battery": 5.32,
+    "standby": 9.56,
+    "pcmark": 13143.0,
+    "pcEss": 10517.0,
+    "pcProd": 15244.0,
+    "pcCC": 18142.0,
+    "pcGaming": 27717.0,
+    "cpuIdle": 49.0,
+    "cpuLoad": 105.0,
+    "gpuIdle": 42.0,
+    "gpuLoad": 72.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "Legion",
+    "model": "Legion Pro 7i Gen 9",
+    "spec": "i9-14900HX + RTX 4090 175W",
+    "year": 2024,
+    "timeSpy": 21417.0,
+    "tsGfx": 22335.0,
+    "tsExtreme": 10593.0,
+    "tsExtremeGfx": 10735.0,
+    "fsExt": null,
+    "fsExtGfx": null,
+    "fsExtPhys": null,
+    "fsUltra": 13881.0,
+    "fsUltraGfx": 13598.0,
+    "fsUltraPhys": 38755.0,
+    "steelNomad": null,
+    "cbR23S": 2120.0,
+    "cbR23M": 31492.0,
+    "cbR24S": 124.0,
+    "cbR24M": 1650.0,
+    "battery": null,
+    "standby": 14.27,
+    "pcmark": 8882.0,
+    "pcEss": 10937.0,
+    "pcProd": 10738.0,
+    "pcCC": 16195.0,
+    "pcGaming": null,
+    "cpuIdle": 56.0,
+    "cpuLoad": 98.0,
+    "gpuIdle": 45.0,
+    "gpuLoad": 80.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "Legion",
+    "model": "Legion Pro 5i Gen 10",
+    "spec": "Core Ultra 9 275HX + RTX 5070 Ti 140W",
+    "year": 2025,
+    "timeSpy": 18048.0,
+    "tsGfx": 18113.0,
+    "tsExtreme": 8979.0,
+    "tsExtremeGfx": 8521.0,
+    "fsExt": 21824.0,
+    "fsExtGfx": 22400.0,
+    "fsExtPhys": 51199.0,
+    "fsUltra": 11775.0,
+    "fsUltraGfx": 11306.0,
+    "fsUltraPhys": 50915.0,
+    "steelNomad": 4031.0,
+    "cbR23S": 2184.0,
+    "cbR23M": 38057.0,
+    "cbR24S": 133.0,
+    "cbR24M": 2077.0,
+    "battery": 3.31,
+    "standby": 5.39,
+    "pcmark": null,
+    "pcEss": null,
+    "pcProd": null,
+    "pcCC": null,
+    "pcGaming": null,
+    "cpuIdle": 50.0,
+    "cpuLoad": 105.0,
+    "gpuIdle": 45.0,
+    "gpuLoad": 79.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "Legion",
+    "model": "Legion 7a Gen 11",
+    "spec": "Ryzen AI Max+ 388 + Radeon 8060S",
+    "year": 2026,
+    "timeSpy": 11567.0,
+    "tsGfx": 11734.0,
+    "tsExtreme": 5245.0,
+    "tsExtremeGfx": 5157.0,
+    "fsExt": 12817.0,
+    "fsExtGfx": 13871.0,
+    "fsExtPhys": 32320.0,
+    "fsUltra": 7138.0,
+    "fsUltraGfx": 7030.0,
+    "fsUltraPhys": 32265.0,
+    "steelNomad": 2187.0,
+    "cbR23S": 1983.0,
+    "cbR23M": 20145.0,
+    "cbR24S": 112.0,
+    "cbR24M": 1017.0,
+    "battery": 9.03,
+    "standby": 12.18,
+    "pcmark": 12166.0,
+    "pcEss": 9792.0,
+    "pcProd": 18417.0,
+    "pcCC": 14915.0,
+    "pcGaming": 22008.0,
+    "cpuIdle": 38.0,
+    "cpuLoad": 98.0,
+    "gpuIdle": 38.0,
+    "gpuLoad": 82.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "Legion",
+    "model": "Legion 7i Gen 10",
+    "spec": "Core Ultra 9 275HX + RTX 5070 115W",
+    "year": 2025,
+    "timeSpy": 14608.0,
+    "tsGfx": 14155.0,
+    "tsExtreme": 6992.0,
+    "tsExtremeGfx": 6500.0,
+    "fsExt": 17358.0,
+    "fsExtGfx": 17340.0,
+    "fsExtPhys": 48863.0,
+    "fsUltra": 8864.0,
+    "fsUltraGfx": 8451.0,
+    "fsUltraPhys": 48839.0,
+    "steelNomad": 3099.0,
+    "cbR23S": 2206.0,
+    "cbR23M": 33190.0,
+    "cbR24S": 135.0,
+    "cbR24M": 1931.0,
+    "battery": 5.27,
+    "standby": 9.02,
+    "pcmark": 11888.0,
+    "pcEss": 11028.0,
+    "pcProd": 11352.0,
+    "pcCC": 16416.0,
+    "pcGaming": 26264.0,
+    "cpuIdle": 49.0,
+    "cpuLoad": 105.0,
+    "gpuIdle": 45.0,
+    "gpuLoad": 80.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "Legion",
+    "model": "Legion 7i Gen 9",
+    "spec": "i9-14900HX + RTX 4070 140W",
+    "year": 2024,
+    "timeSpy": 13120.0,
+    "tsGfx": 12829.0,
+    "tsExtreme": null,
+    "tsExtremeGfx": null,
+    "fsExt": 14222.0,
+    "fsExtGfx": 14594.0,
+    "fsExtPhys": 36152.0,
+    "fsUltra": 7231.0,
+    "fsUltraGfx": 6947.0,
+    "fsUltraPhys": 36771.0,
+    "steelNomad": null,
+    "cbR23S": 2114.0,
+    "cbR23M": 24755.0,
+    "cbR24S": 124.0,
+    "cbR24M": 1451.0,
+    "battery": 4.15,
+    "standby": 6.3,
+    "pcmark": 8634.0,
+    "pcEss": 10876.0,
+    "pcProd": 10966.0,
+    "pcCC": 14647.0,
+    "pcGaming": null,
+    "cpuIdle": 54.0,
+    "cpuLoad": 100.0,
+    "gpuIdle": 43.0,
+    "gpuLoad": 79.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "Legion",
+    "model": "Legion 5i Gen 10",
+    "spec": "i9-14900HX + RTX 5070 115W",
+    "year": 2025,
+    "timeSpy": 14580.0,
+    "tsGfx": 14313.0,
+    "tsExtreme": 6879.0,
+    "tsExtremeGfx": 6559.0,
+    "fsExt": 18043.0,
+    "fsExtGfx": 18635.0,
+    "fsExtPhys": 41357.0,
+    "fsUltra": 8891.0,
+    "fsUltraGfx": 8545.0,
+    "fsUltraPhys": 41889.0,
+    "steelNomad": 3219.0,
+    "cbR23S": null,
+    "cbR23M": null,
+    "cbR24S": null,
+    "cbR24M": null,
+    "battery": null,
+    "standby": null,
+    "pcmark": null,
+    "pcEss": null,
+    "pcProd": null,
+    "pcCC": null,
+    "pcGaming": null,
+    "cpuIdle": 56.0,
+    "cpuLoad": 98.0,
+    "gpuIdle": 45.0,
+    "gpuLoad": 83.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "Legion",
+    "model": "Legion 5i Gen 10",
+    "spec": "i7-14700HX + RTX 5060 115W",
+    "year": 2025,
+    "timeSpy": 12852.0,
+    "tsGfx": 12346.0,
+    "tsExtreme": 6023.0,
+    "tsExtremeGfx": 5738.0,
+    "fsExt": 15691.0,
+    "fsExtGfx": 16039.0,
+    "fsExtPhys": 39545.0,
+    "fsUltra": 7781.0,
+    "fsUltraGfx": 7562.0,
+    "fsUltraPhys": 39617.0,
+    "steelNomad": 2720.0,
+    "cbR23S": 2045.0,
+    "cbR23M": 26335.0,
+    "cbR24S": 118.0,
+    "cbR24M": 1394.0,
+    "battery": 4.39,
+    "standby": 6.29,
+    "pcmark": 10481.0,
+    "pcEss": 11017.0,
+    "pcProd": 8753.0,
+    "pcCC": 14549.0,
+    "pcGaming": 23249.0,
+    "cpuIdle": 55.0,
+    "cpuLoad": null,
+    "gpuIdle": 58.0,
+    "gpuLoad": null
+  },
+  {
+    "brand": "Lenovo",
+    "series": "Legion",
+    "model": "Legion 5a Gen 11",
+    "spec": "Ryzen 7 250 + RTX 5060 115W",
+    "year": 2026,
+    "timeSpy": 12144.0,
+    "tsGfx": 12565.0,
+    "tsExtreme": 5780.0,
+    "tsExtremeGfx": 5858.0,
+    "fsExt": 15199.0,
+    "fsExtGfx": 16010.0,
+    "fsExtPhys": 26837.0,
+    "fsUltra": 7463.0,
+    "fsUltraGfx": 7240.0,
+    "fsUltraPhys": 27084.0,
+    "steelNomad": 2729.0,
+    "cbR23S": 1777.0,
+    "cbR23M": 16531.0,
+    "cbR24S": 103.0,
+    "cbR24M": 881.0,
+    "battery": 8.37,
+    "standby": 14.16,
+    "pcmark": 10558.0,
+    "pcEss": 8785.0,
+    "pcProd": 12331.0,
+    "pcCC": 12748.0,
+    "pcGaming": 24321.0,
+    "cpuIdle": 36.0,
+    "cpuLoad": 81.0,
+    "gpuIdle": 48.0,
+    "gpuLoad": 85.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "LOQ",
+    "model": "LOQ 15 Gen 10",
+    "spec": "i5-13450HX + RTX 5060 100W",
+    "year": 2025,
+    "timeSpy": 11388.0,
+    "tsGfx": 11624.0,
+    "tsExtreme": 5119.0,
+    "tsExtremeGfx": 5381.0,
+    "fsExt": 13788.0,
+    "fsExtGfx": 14208.0,
+    "fsExtPhys": 27040.0,
+    "fsUltra": 7078.0,
+    "fsUltraGfx": 6826.0,
+    "fsUltraPhys": 27504.0,
+    "steelNomad": 2220.0,
+    "cbR23S": null,
+    "cbR23M": null,
+    "cbR24S": null,
+    "cbR24M": null,
+    "battery": 4.23,
+    "standby": 5.54,
+    "pcmark": 8845.0,
+    "pcEss": 9116.0,
+    "pcProd": 7833.0,
+    "pcCC": 11848.0,
+    "pcGaming": 19548.0,
+    "cpuIdle": 46.0,
+    "cpuLoad": 98.0,
+    "gpuIdle": 46.0,
+    "gpuLoad": 82.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "LOQ",
+    "model": "LOQ 17 Gen 10",
+    "spec": "i7-14700HX + RTX 5070 115W",
+    "year": 2025,
+    "timeSpy": 13409.0,
+    "tsGfx": 13665.0,
+    "tsExtreme": 6546.0,
+    "tsExtremeGfx": 6302.0,
+    "fsExt": 16402.0,
+    "fsExtGfx": 16829.0,
+    "fsExtPhys": 34593.0,
+    "fsUltra": 8084.0,
+    "fsUltraGfx": 7842.0,
+    "fsUltraPhys": 37391.0,
+    "steelNomad": 3034.0,
+    "cbR23S": 2120.0,
+    "cbR23M": 27438.0,
+    "cbR24S": 124.0,
+    "cbR24M": 1309.0,
+    "battery": 4.48,
+    "standby": 11.08,
+    "pcmark": 11261.0,
+    "pcEss": 9125.0,
+    "pcProd": 15074.0,
+    "pcCC": 12549.0,
+    "pcGaming": 25175.0,
+    "cpuIdle": 48.0,
+    "cpuLoad": 97.0,
+    "gpuIdle": 39.0,
+    "gpuLoad": 75.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "LOQ",
+    "model": "LOQ 15 Gen 11",
+    "spec": "Ryzen 7 250 + RTX 5050 100W",
+    "year": 2026,
+    "timeSpy": 10141.0,
+    "tsGfx": 10168.0,
+    "tsExtreme": 4866.0,
+    "tsExtremeGfx": 4802.0,
+    "fsExt": 12773.0,
+    "fsExtGfx": 13290.0,
+    "fsExtPhys": 26334.0,
+    "fsUltra": 6282.0,
+    "fsUltraGfx": 6066.0,
+    "fsUltraPhys": 27500.0,
+    "steelNomad": 2429.0,
+    "cbR23S": 1769.0,
+    "cbR23M": 15801.0,
+    "cbR24S": 105.0,
+    "cbR24M": 857.0,
+    "battery": 7.46,
+    "standby": 16.38,
+    "pcmark": 11101.0,
+    "pcEss": 9277.0,
+    "pcProd": 18791.0,
+    "pcCC": 11433.0,
+    "pcGaming": 20593.0,
+    "cpuIdle": 33.0,
+    "cpuLoad": 78.0,
+    "gpuIdle": 44.0,
+    "gpuLoad": 75.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "LOQ",
+    "model": "LOQ 15 Gen 10",
+    "spec": "i7-13650HX + RTX 5050 100W",
+    "year": 2025,
+    "timeSpy": 10095.0,
+    "tsGfx": 9745.0,
+    "tsExtreme": 4631.0,
+    "tsExtremeGfx": 4528.0,
+    "fsExt": 11343.0,
+    "fsExtGfx": 11445.0,
+    "fsExtPhys": 29082.0,
+    "fsUltra": 6011.0,
+    "fsUltraGfx": 5809.0,
+    "fsUltraPhys": 29280.0,
+    "steelNomad": 2268.0,
+    "cbR23S": 1850.0,
+    "cbR23M": 18358.0,
+    "cbR24S": 110.0,
+    "cbR24M": 935.0,
+    "battery": 2.16,
+    "standby": 2.07,
+    "pcmark": null,
+    "pcEss": null,
+    "pcProd": null,
+    "pcCC": null,
+    "pcGaming": null,
+    "cpuIdle": 51.0,
+    "cpuLoad": 98.0,
+    "gpuIdle": 41.0,
+    "gpuLoad": 87.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "LOQ",
+    "model": "LOQ 15 Gen 9",
+    "spec": "i5-13450HX + 3050 6GB 95W",
+    "year": 2024,
+    "timeSpy": 6144.0,
+    "tsGfx": 5692.0,
+    "tsExtreme": 2766.0,
+    "tsExtremeGfx": 2554.0,
+    "fsExt": 6243.0,
+    "fsExtGfx": 6325.0,
+    "fsExtPhys": 27691.0,
+    "fsUltra": 3199.0,
+    "fsUltraGfx": 3036.0,
+    "fsUltraPhys": 26818.0,
+    "steelNomad": null,
+    "cbR23S": 1673.0,
+    "cbR23M": 15608.0,
+    "cbR24S": null,
+    "cbR24M": null,
+    "battery": 2.06,
+    "standby": 2.43,
+    "pcmark": null,
+    "pcEss": null,
+    "pcProd": null,
+    "pcCC": null,
+    "pcGaming": null,
+    "cpuIdle": 36.0,
+    "cpuLoad": 99.0,
+    "gpuIdle": 36.0,
+    "gpuLoad": 77.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "LOQ",
+    "model": "LOQ 15 Gen 9",
+    "spec": "i5-12450HX + RTX 3050 6GB 95W",
+    "year": 2025,
+    "timeSpy": 6281.0,
+    "tsGfx": 5999.0,
+    "tsExtreme": 2805.0,
+    "tsExtremeGfx": 2671.0,
+    "fsExt": 6756.0,
+    "fsExtGfx": 6985.0,
+    "fsExtPhys": 21555.0,
+    "fsUltra": 3402.0,
+    "fsUltraGfx": 3257.0,
+    "fsUltraPhys": 21802.0,
+    "steelNomad": 1169.0,
+    "cbR23S": 1663.0,
+    "cbR23M": 11384.0,
+    "cbR24S": null,
+    "cbR24M": null,
+    "battery": 5.56,
+    "standby": 7.42,
+    "pcmark": 6004.0,
+    "pcEss": 8823.0,
+    "pcProd": 7832.0,
+    "pcCC": 8500.0,
+    "pcGaming": null,
+    "cpuIdle": 41.0,
+    "cpuLoad": 96.0,
+    "gpuIdle": 41.0,
+    "gpuLoad": 73.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "LOQ",
+    "model": "LOQ 15 Essential 15 IRX11E",
+    "spec": "i7-13650HX + RTX 5050 8GB 65W",
+    "year": 2025,
+    "timeSpy": 8841.0,
+    "tsGfx": 8502.0,
+    "tsExtreme": 4090.0,
+    "tsExtremeGfx": 4000.0,
+    "fsExt": 10788.0,
+    "fsExtGfx": 11296.0,
+    "fsExtPhys": 28940.0,
+    "fsUltra": 5481.0,
+    "fsUltraGfx": 5321.0,
+    "fsUltraPhys": 29218.0,
+    "steelNomad": 1919.0,
+    "cbR23S": 1875.0,
+    "cbR23M": 15605.0,
+    "cbR24S": 110.0,
+    "cbR24M": 809.0,
+    "battery": 5.14,
+    "standby": 11.26,
+    "pcmark": 10298.0,
+    "pcEss": 9019.0,
+    "pcProd": 19402.0,
+    "pcCC": 10395.0,
+    "pcGaming": 16710.0,
+    "cpuIdle": 49.0,
+    "cpuLoad": 95.0,
+    "gpuIdle": 43.0,
+    "gpuLoad": 76.0
+  },
+  {
+    "brand": "Lenovo",
+    "series": "LOQ",
+    "model": "LOQ 15 Essential IRX9E",
+    "spec": "i5-12450HX + RTX 3050 6GB 65W",
+    "year": 2024,
+    "timeSpy": 5229.0,
+    "tsGfx": 4931.0,
+    "tsExtreme": 2332.0,
+    "tsExtremeGfx": 2195.0,
+    "fsExt": 5852.0,
+    "fsExtGfx": 6058.0,
+    "fsExtPhys": 22333.0,
+    "fsUltra": 2964.0,
+    "fsUltraGfx": 2842.0,
+    "fsUltraPhys": 22313.0,
+    "steelNomad": null,
+    "cbR23S": 1578.0,
+    "cbR23M": 10441.0,
+    "cbR24S": null,
+    "cbR24M": null,
+    "battery": 5.04,
+    "standby": 7.42,
+    "pcmark": 5937.0,
+    "pcEss": 8432.0,
+    "pcProd": 8862.0,
+    "pcCC": 7602.0,
+    "pcGaming": null,
+    "cpuIdle": 42.0,
+    "cpuLoad": 90.0,
+    "gpuIdle": 40.0,
+    "gpuLoad": 74.0
+  },
+  {
+    "brand": "HP",
+    "series": "Omen",
+    "model": "Omen Max 16",
+    "spec": "Core Ultra 9 275HX+ RTX 5080 175W",
+    "year": 2025,
+    "timeSpy": 20672.0,
+    "tsGfx": 21635.0,
+    "tsExtreme": 10740.0,
+    "tsExtremeGfx": 10590.0,
+    "fsExt": 26744.0,
+    "fsExtGfx": 28770.0,
+    "fsExtPhys": 43872.0,
+    "fsUltra": 14862.0,
+    "fsUltraGfx": 14435.0,
+    "fsUltraPhys": 44999.0,
+    "steelNomad": 5273.0,
+    "cbR23S": 2195.0,
+    "cbR23M": 36039.0,
+    "cbR24S": 133.0,
+    "cbR24M": 2043.0,
+    "battery": 4.52,
+    "standby": 7.47,
+    "pcmark": 8305.0,
+    "pcEss": 10482.0,
+    "pcProd": 9513.0,
+    "pcCC": 15585.0,
+    "pcGaming": null,
+    "cpuIdle": 49.0,
+    "cpuLoad": 101.0,
+    "gpuIdle": 52.0,
+    "gpuLoad": 78.0
+  },
+  {
+    "brand": "HP",
+    "series": "Omen",
+    "model": "Omen 16",
+    "spec": "Ryzen 9 8940HX + RTX 5060 115W",
+    "year": 2025,
+    "timeSpy": 11958.0,
+    "tsGfx": 11868.0,
+    "tsExtreme": 5849.0,
+    "tsExtremeGfx": 5475.0,
+    "fsExt": 15211.0,
+    "fsExtGfx": 15570.0,
+    "fsExtPhys": 35626.0,
+    "fsUltra": 7519.0,
+    "fsUltraGfx": 7251.0,
+    "fsUltraPhys": 35659.0,
+    "steelNomad": 2577.0,
+    "cbR23S": 1876.0,
+    "cbR23M": 29388.0,
+    "cbR24S": 111.0,
+    "cbR24M": 1580.0,
+    "battery": 1.11,
+    "standby": 1.15,
+    "pcmark": 10897.0,
+    "pcEss": 10344.0,
+    "pcProd": 10282.0,
+    "pcCC": 14358.0,
+    "pcGaming": 24949.0,
+    "cpuIdle": 68.0,
+    "cpuLoad": 93.0,
+    "gpuIdle": 52.0,
+    "gpuLoad": 80.0
+  },
+  {
+    "brand": "HP",
+    "series": "Omen",
+    "model": "HyperX Omen 16",
+    "spec": "Ryzen AI 9 465 + RTX 5070 115W",
+    "year": 2026,
+    "timeSpy": 13086.0,
+    "tsGfx": 14032.0,
+    "tsExtreme": 6498.0,
+    "tsExtremeGfx": 6502.0,
+    "fsExt": 17488.0,
+    "fsExtGfx": 18129.0,
+    "fsExtPhys": 31155.0,
+    "fsUltra": 8538.0,
+    "fsUltraGfx": 8277.0,
+    "fsUltraPhys": 31331.0,
+    "steelNomad": 3123.0,
+    "cbR23S": 1961.0,
+    "cbR23M": 20651.0,
+    "cbR24S": 114.0,
+    "cbR24M": 1012.0,
+    "battery": 7.13,
+    "standby": 8.59,
+    "pcmark": 11473.0,
+    "pcEss": 9118.0,
+    "pcProd": 14661.0,
+    "pcCC": 14155.0,
+    "pcGaming": 24743.0,
+    "cpuIdle": 33.8,
+    "cpuLoad": 85.0,
+    "gpuIdle": 35.0,
+    "gpuLoad": 70.0
+  },
+  {
+    "brand": "HP",
+    "series": "Omen",
+    "model": "HyperX Omen 15",
+    "spec": "i5-14450HX + RTX 5050 115W",
+    "year": 2026,
+    "timeSpy": 10017.0,
+    "tsGfx": 9770.0,
+    "tsExtreme": 4722.0,
+    "tsExtremeGfx": 4636.0,
+    "fsExt": 12694.0,
+    "fsExtGfx": 13109.0,
+    "fsExtPhys": 29237.0,
+    "fsUltra": 6271.0,
+    "fsUltraGfx": 6031.0,
+    "fsUltraPhys": 28319.0,
+    "steelNomad": 2268.0,
+    "cbR23S": 1808.0,
+    "cbR23M": 16925.0,
+    "cbR24S": 107.0,
+    "cbR24M": 815.0,
+    "battery": 6.04,
+    "standby": 6.38,
+    "pcmark": 10419.0,
+    "pcEss": 8472.0,
+    "pcProd": 18051.0,
+    "pcCC": 10922.0,
+    "pcGaming": 19068.0,
+    "cpuIdle": 45.0,
+    "cpuLoad": 78.0,
+    "gpuIdle": 35.0,
+    "gpuLoad": 74.0
+  },
+  {
+    "brand": "HP",
+    "series": "Omen",
+    "model": "HyperX Omen 15",
+    "spec": "i7-14650HX + RTX 5060 115W",
+    "year": 2026,
+    "timeSpy": 12355.0,
+    "tsGfx": 12084.0,
+    "tsExtreme": 5936.0,
+    "tsExtremeGfx": 5749.0,
+    "fsExt": 15654.0,
+    "fsExtGfx": 16063.0,
+    "fsExtPhys": 34696.0,
+    "fsUltra": 7735.0,
+    "fsUltraGfx": 7480.0,
+    "fsUltraPhys": 34737.0,
+    "steelNomad": 2739.0,
+    "cbR23S": 2006.0,
+    "cbR23M": 23520.0,
+    "cbR24S": 117.0,
+    "cbR24M": 1078.0,
+    "battery": 3.21,
+    "standby": 3.44,
+    "pcmark": 11568.0,
+    "pcEss": 8556.0,
+    "pcProd": 19790.0,
+    "pcCC": 11921.0,
+    "pcGaming": 23972.0,
+    "cpuIdle": 45.0,
+    "cpuLoad": null,
+    "gpuIdle": 40.0,
+    "gpuLoad": 74.0
+  },
+  {
+    "brand": "HP",
+    "series": "Victus",
+    "model": "Victus 16",
+    "spec": "Ryzen 7 8845HS + RTX 4060 120W",
+    "year": 2024,
+    "timeSpy": 10796.0,
+    "tsGfx": 10796.0,
+    "tsExtreme": 5085.0,
+    "tsExtremeGfx": 5009.0,
+    "fsExt": 12392.0,
+    "fsExtGfx": 13033.0,
+    "fsExtPhys": 28017.0,
+    "fsUltra": 6259.0,
+    "fsUltraGfx": 6072.0,
+    "fsUltraPhys": 27912.0,
+    "steelNomad": null,
+    "cbR23S": 1741.0,
+    "cbR23M": 15922.0,
+    "cbR24S": 103.0,
+    "cbR24M": 898.0,
+    "battery": 6.1,
+    "standby": 9.2,
+    "pcmark": 8081.0,
+    "pcEss": 10422.0,
+    "pcProd": 10728.0,
+    "pcCC": 12809.0,
+    "pcGaming": null,
+    "cpuIdle": 51.0,
+    "cpuLoad": 86.0,
+    "gpuIdle": 46.0,
+    "gpuLoad": 80.0
+  },
+  {
+    "brand": "HP",
+    "series": "Victus",
+    "model": "Victus 16",
+    "spec": "Ryzen 7 8845HS + RTX 4070 120W",
+    "year": 2024,
+    "timeSpy": 12239.0,
+    "tsGfx": 12554.0,
+    "tsExtreme": 5683.0,
+    "tsExtremeGfx": 5710.0,
+    "fsExt": 13921.0,
+    "fsExtGfx": 14637.0,
+    "fsExtPhys": 27770.0,
+    "fsUltra": 6993.0,
+    "fsUltraGfx": 6779.0,
+    "fsUltraPhys": 27776.0,
+    "steelNomad": null,
+    "cbR23S": 1727.0,
+    "cbR23M": 15954.0,
+    "cbR24S": 103.0,
+    "cbR24M": 898.0,
+    "battery": 5.11,
+    "standby": 7.32,
+    "pcmark": 8089.0,
+    "pcEss": 10420.0,
+    "pcProd": 10302.0,
+    "pcCC": 13378.0,
+    "pcGaming": null,
+    "cpuIdle": 36.0,
+    "cpuLoad": 89.0,
+    "gpuIdle": 39.0,
+    "gpuLoad": 75.0
+  },
+  {
+    "brand": "HP",
+    "series": "Victus",
+    "model": "Victus 15",
+    "spec": "Ryzen AI 5 340 + RTX 5050 80W",
+    "year": 2025,
+    "timeSpy": 8843.0,
+    "tsGfx": 9137.0,
+    "tsExtreme": 4214.0,
+    "tsExtremeGfx": 4217.0,
+    "fsExt": 11730.0,
+    "fsExtGfx": 12234.0,
+    "fsExtPhys": 23929.0,
+    "fsUltra": 5844.0,
+    "fsUltraGfx": 5681.0,
+    "fsUltraPhys": 23949.0,
+    "steelNomad": 1939.0,
+    "cbR23S": 1899.0,
+    "cbR23M": 13235.0,
+    "cbR24S": 112.0,
+    "cbR24M": 644.0,
+    "battery": 9.34,
+    "standby": 11.19,
+    "pcmark": null,
+    "pcEss": null,
+    "pcProd": null,
+    "pcCC": null,
+    "pcGaming": null,
+    "cpuIdle": 48.0,
+    "cpuLoad": 92.0,
+    "gpuIdle": 43.0,
+    "gpuLoad": 72.0
+  },
+  {
+    "brand": "Gigabyte",
+    "series": "Aorus",
+    "model": "Aorus Master 16",
+    "spec": "Core Ultra 9 275HX + RTX 5080 175W",
+    "year": 2025,
+    "timeSpy": 19972.0,
+    "tsGfx": 20758.0,
+    "tsExtreme": 10065.0,
+    "tsExtremeGfx": 9762.0,
+    "fsExt": 23330.0,
+    "fsExtGfx": 24002.0,
+    "fsExtPhys": 48130.0,
+    "fsUltra": 13928.0,
+    "fsUltraGfx": 13465.0,
+    "fsUltraPhys": 44767.0,
+    "steelNomad": 4686.0,
+    "cbR23S": 2184.0,
+    "cbR23M": 37350.0,
+    "cbR24S": 133.0,
+    "cbR24M": 1992.0,
+    "battery": 3.36,
+    "standby": 4.03,
+    "pcmark": 8299.0,
+    "pcEss": 10377.0,
+    "pcProd": 9129.0,
+    "pcCC": 16372.0,
+    "pcGaming": null,
+    "cpuIdle": 49.0,
+    "cpuLoad": 100.0,
+    "gpuIdle": 45.0,
+    "gpuLoad": 81.0
+  },
+  {
+    "brand": "Gigabyte",
+    "series": "A16",
+    "model": "Gaming A16",
+    "spec": "i7-13620H + RTX 5060 85W",
+    "year": 2025,
+    "timeSpy": 11160.0,
+    "tsGfx": 10950.0,
+    "tsExtreme": 5194.0,
+    "tsExtremeGfx": 5129.0,
+    "fsExt": 13625.0,
+    "fsExtGfx": 14334.0,
+    "fsExtPhys": 29533.0,
+    "fsUltra": 6899.0,
+    "fsUltraGfx": 6693.0,
+    "fsUltraPhys": 30210.0,
+    "steelNomad": 2443.0,
+    "cbR23S": 1778.0,
+    "cbR23M": 15222.0,
+    "cbR24S": 108.0,
+    "cbR24M": 857.0,
+    "battery": 7.06,
+    "standby": 8.17,
+    "pcmark": null,
+    "pcEss": null,
+    "pcProd": null,
+    "pcCC": null,
+    "pcGaming": null,
+    "cpuIdle": 49.0,
+    "cpuLoad": 98.0,
+    "gpuIdle": 43.0,
+    "gpuLoad": 81.0
+  },
+  {
+    "brand": "Gigabyte",
+    "series": "A16",
+    "model": "Gaming A16",
+    "spec": "Ryzen 7 260 + RTX 5060 85W",
+    "year": 2025,
+    "timeSpy": 11060.0,
+    "tsGfx": 11305.0,
+    "tsExtreme": 5273.0,
+    "tsExtremeGfx": 5225.0,
+    "fsExt": 14331.0,
+    "fsExtGfx": 14888.0,
+    "fsExtPhys": 28577.0,
+    "fsUltra": 7096.0,
+    "fsUltraGfx": 6876.0,
+    "fsUltraPhys": 28319.0,
+    "steelNomad": 2483.0,
+    "cbR23S": 1776.0,
+    "cbR23M": 16817.0,
+    "cbR24S": 103.0,
+    "cbR24M": 855.0,
+    "battery": 8.0,
+    "standby": 12.21,
+    "pcmark": null,
+    "pcEss": null,
+    "pcProd": null,
+    "pcCC": null,
+    "pcGaming": null,
+    "cpuIdle": 43.0,
+    "cpuLoad": 100.0,
+    "gpuIdle": 42.0,
+    "gpuLoad": 77.0
+  },
+  {
+    "brand": "Gigabyte",
+    "series": "A16",
+    "model": "Gaming A16",
+    "spec": "i5-13420H + RTX 4050 80W",
+    "year": 2025,
+    "timeSpy": 8244.0,
+    "tsGfx": 8165.0,
+    "tsExtreme": 3773.0,
+    "tsExtremeGfx": 3757.0,
+    "fsExt": 9660.0,
+    "fsExtGfx": 10260.0,
+    "fsExtPhys": 22163.0,
+    "fsUltra": 4699.0,
+    "fsUltraGfx": 4513.0,
+    "fsUltraPhys": 23626.0,
+    "steelNomad": 1765.0,
+    "cbR23S": 1604.0,
+    "cbR23M": 10379.0,
+    "cbR24S": 99.0,
+    "cbR24M": 589.0,
+    "battery": 6.21,
+    "standby": 7.59,
+    "pcmark": 6270.0,
+    "pcEss": 8674.0,
+    "pcProd": 8387.0,
+    "pcCC": 9195.0,
+    "pcGaming": null,
+    "cpuIdle": 46.0,
+    "cpuLoad": 92.0,
+    "gpuIdle": 41.0,
+    "gpuLoad": 76.0
+  }
+];;
+
+let activeBrand='ALL';
+let activeYear='ALL';
+let activeSeries='ALL';
+let activeSearch='';
+
+const getData=()=>{
+  return D.filter(l=>{
+    const matchBrand = activeBrand==='ALL' || l.brand===activeBrand;
+    const matchYear = activeYear==='ALL' || l.year?.toString()===activeYear;
+    const matchSeries = activeSeries==='ALL' || l.series===activeSeries;
+    const matchSearch = activeSearch==='' ||
+      [l.model, l.spec, l.brand, l.series].some(field =>
+        field?.toLowerCase().includes(activeSearch.toLowerCase())
+      );
+    return matchBrand && matchYear && matchSeries && matchSearch;
+  });
 };
+const getF=k=>getData().filter(l=>l[k]!=null).sort((a,b)=>b[k]-a[k]);
 
-const CPU_SPECS = {
-  'Core Ultra 9 275HX': {cores:'24C', threads:'24T'},
-  'Core Ultra 9 386H': {cores:'18C', threads:'22T'},
-  'Core Ultra 7 265H': {cores:'16C', threads:'22T'},
-  'Core Ultra 5 245H': {cores:'14C', threads:'18T'},
-  'Ryzen AI Max+ 395': {cores:'16C', threads:'32T'},
-  'Ryzen 7 250': {cores:'8C', threads:'16T'},
-  'Ryzen 5 240': {cores:'6C', threads:'12T'},
-  'i9-14900HX': {cores:'24C', threads:'32T'},
-  'i7-14700HX': {cores:'20C', threads:'28T'},
-};
+// ── COMPARE (defined first so renderAll can call it) ──
+const COMPARE_MAX=6;
+let compareSet=new Set();
 
-let sfSelectedBrands = new Set();
-let sfScoreMetric = 'timeSpy'; // default GPU
-let sfIsGpuTab = true; // start with GPU tab
+function renderComparePicker(){
+  const d=getData();
+  const container=document.getElementById('compare-picker');
+  if(!container)return;
 
-function populateSpecChips() {
-  const gpuTab = document.getElementById('gpu-tab');
-  const cpuTab = document.getElementById('cpu-tab');
-  const gpuChips = document.getElementById('gpu-chips');
-  const cpuChips = document.getElementById('cpu-chips');
+  const groups={};
+  d.forEach(l=>{
+    if(!groups[l.brand])groups[l.brand]={};
+    if(!groups[l.brand][l.series])groups[l.brand][l.series]=[];
+    groups[l.brand][l.series].push(l);
+  });
 
-  // Clear existing chips
-  gpuChips.innerHTML = '';
-  cpuChips.innerHTML = '';
+  let html='';
+  for(const brand in groups){
+    const brandColor=bc(brand);
+    html+=`<div class="compare-picker-group">
+      <div class="compare-picker-brand" style="color:${brandColor}">${brand}</div>`;
 
-  // GPU tab chips
-  const gpuChipsData = [
-    {label: 'NVIDIA', color: '#76b900'},
-    {label: 'AMD', color: '#ed1c24'}
+    for(const series in groups[brand]){
+      html+=`<div class="compare-picker-series-row">
+        <div class="compare-picker-series-label">${series}</div>
+        <div class="compare-picker-laptops">`;
+
+      html+=groups[brand][series].map(l=>{
+        const key=getKey(l);
+        const sel=compareSet.has(key);
+        const c=bc(l.brand);
+        return `<button onclick="toggleCompare('${key.replace(/'/g, "\\'")}')" style="font-family:'JetBrains Mono',monospace;font-size:12px;padding:5px 14px;border-radius:3px;cursor:pointer;transition:all .15s;border:1px solid ${sel?c:'var(--line2)'};background:${sel?c+'22':'transparent'};color:${sel?c:'var(--muted2)'};font-weight:${sel?'600':'400'};margin:2px">${l.model}</button>`;
+      }).join('');
+
+      html+=`</div></div>`;
+    }
+    html+=`</div>`;
+  }
+
+  container.innerHTML=html||'<div class="no-data">No laptops match filters</div>';
+  document.getElementById('compare-count').textContent=compareSet.size+' / 6 selected';
+}
+
+function toggleCompare(key){
+  if(compareSet.has(key)){compareSet.delete(key);}
+  else{if(compareSet.size>=COMPARE_MAX)return;compareSet.add(key);}
+  renderComparePicker();
+  renderCompareTable();
+}
+
+function renderCompareTable(){
+  const result=document.getElementById('compare-result');
+  if(!result)return;
+  if(compareSet.size===0){result.style.display='none';return;}
+  result.style.display='';
+  const sel=[...compareSet].map(k=>D.find(l=>getKey(l)===k)).filter(Boolean);
+  const rows=[
+    {label:'Brand',          fn:l=>l.brand,        dir:null},
+    {label:'Spec',           fn:l=>l.spec,         dir:null},
+    {label:'Year',           fn:l=>l.year||'—',    dir:null},
+    {label:'Time Spy',       fn:l=>l.timeSpy,      dir:'high'},
+    {label:'TS Extreme',     fn:l=>l.tsExtreme,    dir:'high'},
+    {label:'FS Extreme',     fn:l=>l.fsExt,        dir:'high'},
+    {label:'FS Ultra',       fn:l=>l.fsUltra,      dir:'high'},
+    {label:'Steel Nomad',    fn:l=>l.steelNomad,   dir:'high'},
+    {label:'CB R23 Multi',   fn:l=>l.cbR23M,       dir:'high'},
+    {label:'CB R23 Single',  fn:l=>l.cbR23S,       dir:'high'},
+    {label:'CB R24 Multi',   fn:l=>l.cbR24M,       dir:'high'},
+    {label:'CB R24 Single',  fn:l=>l.cbR24S,       dir:'high'},
+    {label:'Battery (h)',    fn:l=>l.battery,      dir:'high',dec:2,unit:'h'},
+    {label:'Standby (h)',    fn:l=>l.standby,      dir:'high',dec:2,unit:'h'},
+    {label:'CPU Idle °C',    fn:l=>l.cpuIdle,      dir:'low', unit:'°C'},
+    {label:'CPU Load °C',    fn:l=>l.cpuLoad,      dir:'low', unit:'°C'},
+    {label:'GPU Idle °C',    fn:l=>l.gpuIdle,      dir:'low', unit:'°C'},
+    {label:'GPU Load °C',    fn:l=>l.gpuLoad,      dir:'low', unit:'°C'},
+    {label:'PCMark 10',      fn:l=>l.pcmark,       dir:'high'},
+    {label:'Essentials',     fn:l=>l.pcEss,        dir:'high'},
+    {label:'Productivity',   fn:l=>l.pcProd,       dir:'high'},
+    {label:'Content Creation',fn:l=>l.pcCC,        dir:'high'},
+    {label:'Gaming',         fn:l=>l.pcGaming,     dir:'high'},
   ];
 
-  gpuChipsData.forEach(chip => {
-    const chipEl = document.createElement('div');
-    chipEl.className = `spec-chip ${sfSelectedBrands.has(chip.label) ? 'active' : ''}`;
-    chipEl.style.backgroundColor = chip.color;
-    chipEl.textContent = chip.label;
-    chipEl.onclick = () => {
-      if (sfSelectedBrands.has(chip.label)) {
-        sfSelectedBrands.delete(chip.label);
-      } else {
-        sfSelectedBrands.clear();
-        sfSelectedBrands.add(chip.label);
-      }
-      updateActiveChip(gpuChips, chip.label);
-      renderSpecFilter();
-    };
-    gpuChips.appendChild(chipEl);
-  });
 
-  // CPU tab chips
-  const cpuChipsData = [
-    {label: 'Intel', color: '#0068b5'},
-    {label: 'AMD', color: '#ed1c24'}
+  const fmtV=(v,row)=>{
+    if(v==null)return'—';
+    if(typeof v==='string')return v;
+    const n=Number(v);
+    const s=row.dec?n.toFixed(row.dec):n.toLocaleString();
+    return s+(row.unit||'');
+  };
+
+  document.getElementById('compare-thead').innerHTML=
+    '<tr>'+
+    '<th class="sticky-col sticky-col-0" style="padding:10px 16px;color:var(--muted);font-family:\'JetBrains Mono\',monospace;font-size:14px;text-align:left;background:var(--bg1);z-index:3">Metric</th>'+
+    sel.map(l=>`<th style="padding:10px 16px;color:${bc(l.brand)};font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;text-align:center;min-width:200px">${l.model}<br><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:400;color:var(--muted)">${l.spec}</span></th>`).join('')+
+    '</tr>';
+
+  document.getElementById('compare-tbody').innerHTML=rows.map(row=>{
+    const vals=sel.map(l=>row.fn(l));
+    // Parse numeric values
+    const nums=vals.map(v=>typeof v==='number'?v:(typeof v==='string'?parseFloat(v.replace(/[^0-9.]/g,'')):NaN));
+    const validNums=nums.filter(n=>!isNaN(n));
+
+    // Find best value index
+    let bestIdx=-1;
+    if(row.dir && validNums.length>1){
+      const bv=row.dir==='high'?Math.max(...validNums):Math.min(...validNums);
+      bestIdx=nums.findIndex(n=>n===bv);
+    }
+
+    // Build cells
+    const cells=vals.map((v,i)=>{
+      const isBest=i===bestIdx;
+      const disp=fmtV(v,row);
+      const myNum=nums[i];
+
+      // Percentage difference vs best (only if numeric row, >1 valid value, this cell has a value)
+      let pctBadge='';
+      if(row.dir && validNums.length>1 && !isNaN(myNum) && bestIdx!==-1 && i!==bestIdx){
+        const bestNum=nums[bestIdx];
+        if(bestNum!==0){
+          // For 'high': how far below best? For 'low': how far above best (worse)?
+          let diff;
+          if(row.dir==='high'){
+            diff=((myNum-bestNum)/bestNum)*100; // negative = worse
+          } else {
+            diff=((bestNum-myNum)/bestNum)*100; // negative = worse (myNum > bestNum means hotter)
+          }
+          const absDiff=Math.abs(diff).toFixed(1);
+          if(diff<0){
+            // worse than best
+            pctBadge=`<div style="margin-top:5px;font-size:14px;font-weight:600;color:#ff4560">▼ ${absDiff}%</div>`;
+          } else {
+            // equal or better (shouldn't happen for non-best but guard)
+            pctBadge=`<div style="margin-top:5px;font-size:14px;font-weight:600;color:#39ff84">▲ ${absDiff}%</div>`;
+          }
+        }
+      } else if(row.dir && validNums.length>1 && !isNaN(myNum) && i===bestIdx){
+        // Best cell — show crown indicator only if more than one valid
+        pctBadge=`<div style="margin-top:5px;font-size:13px;color:#39ff84;font-weight:600">▲ Best ✦</div>`;
+      }
+
+      return `<td style="padding:10px 16px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:16px;color:${isBest?'var(--cyan)':'var(--text)'};background:${isBest?'rgba(0,212,255,0.07)':'transparent'};font-weight:${isBest?'700':'400'};vertical-align:top">${disp}${pctBadge}</td>`;
+    }).join('');
+
+    return `<tr style="border-bottom:1px solid var(--line)">
+      <td class="sticky-col sticky-col-0" style="padding:10px 16px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:14px;white-space:nowrap;background:var(--bg1);vertical-align:middle">${row.label}</td>
+      ${cells}
+    </tr>`;
+  }).join('');
+}
+function setBrand(b,btn){
+  activeBrand=b;
+  document.querySelectorAll('.brand-btn[data-b]').forEach(x=>{x.classList.remove('active');x.style.background='';x.style.borderColor='';x.style.color='';});
+  btn.classList.add('active');
+  if(b!=='ALL'){btn.style.background=bc(b);btn.style.borderColor=bc(b);btn.style.color='#000';}
+  else{btn.style.background='var(--text)';btn.style.borderColor='var(--text)';btn.style.color='#000';}
+  renderAll();
+}
+
+function setYear(y,btn){
+  activeYear=y;
+  document.querySelectorAll('.brand-btn[data-y]').forEach(x=>{x.classList.remove('active');});
+  btn.classList.add('active');
+  renderAll();
+}
+
+function setSeries(s){
+  activeSeries=s;
+  renderAll();
+}
+
+function setSearch(q){
+  activeSearch=q;
+  renderAll();
+}
+
+function clearFilters(){
+  activeBrand='ALL';
+  activeYear='ALL';
+  activeSeries='ALL';
+  activeSearch='';
+  document.getElementById('global-search').value='';
+  document.getElementById('series-filter').value='ALL';
+  document.querySelectorAll('.brand-btn').forEach(btn=>{
+    btn.classList.remove('active');
+    btn.style.background='';
+    btn.style.borderColor='';
+    btn.style.color='';
+  });
+  // Reset All buttons (Brand and Year)
+  document.querySelector('.brand-btn[data-b="ALL"]').classList.add('active');
+  const allB = document.querySelector('.brand-btn[data-b="ALL"]');
+  allB.style.background='var(--text)';
+  allB.style.borderColor='var(--text)';
+  allB.style.color='#000';
+
+  document.querySelector('.brand-btn[data-y="ALL"]').classList.add('active');
+
+  renderAll();
+}
+
+function barHTML(data,key,limit=20){
+  const vis=data.slice(0,limit);
+  if(!vis.length)return'<div class="no-data">No data for this filter</div>';
+  const mx=vis[0][key]||1;
+  return'<div class="bar-list">'+vis.map((l,i)=>{
+    const v=l[key],p=pct(v,mx),c=bc(l.brand);
+    const rk=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+    return`<div class="bar-item">
+      <span class="rank ${rk}">${i+1}</span>
+      <div class="bar-item-info">
+        <div class="bar-model">${l.model}</div>
+        <div class="bar-spec">${l.spec}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${c}"></div></div>
+      </div>
+      <div><div class="bar-val" style="color:${c}">${fmt(v)}</div><div class="bar-pct">${p}%</div></div>
+    </div>`;}).join('')+'</div>';
+}
+
+function tile(title,icon,meta,body){
+  return`<div class="tile">
+    <div class="tile-head">
+      <div class="tile-title"><span>${icon}</span>${title}</div>
+      <span class="tile-meta">${meta}</span>
+    </div>
+    <div class="tile-body">${body}</div>
+  </div>`;
+}
+
+function renderGPU(){
+  const cfgs=[
+    {k:'timeSpy',    t:'Time Spy',           i:'🎮',m:'3DMark · Higher = better'},
+    {k:'tsExtreme',  t:'Time Spy Extreme',    i:'⚡',m:'3DMark · Higher = better'},
+    {k:'fsExt',      t:'Fire Strike Extreme', i:'🔥',m:'3DMark · Higher = better'},
+    {k:'fsUltra',    t:'Fire Strike Ultra',   i:'💠',m:'3DMark · Higher = better'},
+    {k:'steelNomad', t:'Steel Nomad',         i:'🗡️',m:'3DMark DX12 · Higher = better'},
   ];
+  document.getElementById('gpu-grid').innerHTML=cfgs.map(c=>tile(c.t,c.i,c.m,barHTML(getF(c.k),c.k))).join('');
+}
 
-  cpuChipsData.forEach(chip => {
-    const chipEl = document.createElement('div');
-    chipEl.className = `spec-chip ${sfSelectedBrands.has(chip.label) ? 'active' : ''}`;
-    chipEl.style.backgroundColor = chip.color;
-    chipEl.textContent = chip.label;
-    chipEl.onclick = () => {
-      if (sfSelectedBrands.has(chip.label)) {
-        sfSelectedBrands.delete(chip.label);
-      } else {
-        sfSelectedBrands.clear();
-        sfSelectedBrands.add(chip.label);
-      }
-      updateActiveChip(cpuChips, chip.label);
-      renderSpecFilter();
-    };
-    cpuChips.appendChild(chipEl);
-  });
+function renderCPU(){
+  const cfgs=[
+    {k:'cbR23M',t:'Cinebench R23 Multi-Core', i:'🧠',m:'Higher = faster multi-thread'},
+    {k:'cbR23S',t:'Cinebench R23 Single-Core',i:'🧵',m:'Higher = faster single-thread'},
+    {k:'cbR24M',t:'Cinebench R24 Multi-Core', i:'⚙️',m:'Newer · Higher = better'},
+    {k:'cbR24S',t:'Cinebench R24 Single-Core',i:'🔩',m:'Newer · Higher = better'},
+  ];
+  document.getElementById('cpu-grid').innerHTML=cfgs.map(c=>tile(c.t,c.i,c.m,barHTML(getF(c.k),c.k))).join('');
+}
 
-  // Set active tab
-  if (sfIsGpuTab) {
-    gpuTab.classList.add('active');
-    cpuTab.classList.remove('active');
-    gpuChips.style.display = 'flex';
-    cpuChips.style.display = 'none';
-    // Reset score metric for GPU tab
-    sfScoreMetric = 'timeSpy';
-    updateScoreChips();
-  } else {
-    cpuTab.classList.add('active');
-    gpuTab.classList.remove('active');
-    cpuChips.style.display = 'flex';
-    gpuChips.style.display = 'none';
-    // Reset score metric for CPU tab
-    sfScoreMetric = 'cbR23M';
-    updateScoreChips();
+function renderBattery(){
+  function battBar(data,key,color){
+    const vis=data.slice(0,25);
+    if(!vis.length)return'<div class="no-data">No data</div>';
+    const mx=vis[0][key]||1;
+    return'<div class="bar-list">'+vis.map((l,i)=>{
+      const v=l[key],p=pct(v,mx);
+      const rk=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+      return`<div class="bar-item">
+        <span class="rank ${rk}">${i+1}</span>
+        <div class="bar-item-info">
+          <div class="bar-model">${l.model}</div>
+          <div class="bar-spec">${l.spec}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${color}"></div></div>
+        </div>
+        <div><div class="bar-val" style="color:${color}">${v.toFixed(2)}h</div><div class="bar-pct">${p}%</div></div>
+      </div>`;}).join('')+'</div>';
   }
+  document.getElementById('battery-grid').innerHTML=
+    tile('Social + YouTube Usage','🔋','Hours · Higher = better',battBar(getF('battery'),'battery','#39ff84'))+
+    tile('Standby Mode','💤','Hours · Higher = better',battBar(getF('standby'),'standby','#20e870'));
 }
 
-function updateActiveChip(chipsContainer, activeLabel) {
-  const chips = chipsContainer.querySelectorAll('.spec-chip');
-  chips.forEach(chip => {
-    if (chip.textContent === activeLabel) {
-      chip.classList.add('active');
-    } else {
-      chip.classList.remove('active');
-    }
-  });
-}
-
-function populateScoreChips() {
-  const scoreChips = document.getElementById('score-chips');
-  scoreChips.innerHTML = '';
-
-  let scoreOptions;
-  if (sfIsGpuTab) {
-    scoreOptions = [
-      {label: 'Time Spy', value: 'timeSpy', display: 'timeSpy'},
-      {label: 'TS Extreme', value: 'tsExtreme', display: 'tsExtreme'},
-      {label: 'FS Ext', value: 'fsExt', display: 'fsExt'},
-      {label: 'FS Ultra', value: 'fsUltra', display: 'fsUltra'},
-      {label: 'Steel Nomad', value: 'steelNomad', display: 'steelNomad'}
-    ];
-  } else {
-    scoreOptions = [
-      {label: 'CB R23 Multi', value: 'cbR23M', display: 'cbR23M'},
-      {label: 'CB R23 Single', value: 'cbR23S', display: 'cbR23S'},
-      {label: 'CB R24 Multi', value: 'cbR24M', display: 'cbR24M'},
-      {label: 'CB R24 Single', value: 'cbR24S', display: 'cbR24S'}
-    ];
+function renderThermals(){
+  function tempTile(title,icon,idleK,loadK){
+    const idleData=getData().filter(l=>l[idleK]!=null).sort((a,b)=>a[idleK]-b[idleK]);
+    const loadData=getData().filter(l=>l[loadK]!=null).sort((a,b)=>a[loadK]-b[loadK]);
+    if(!idleData.length&&!loadData.length)return tile(title,icon,'°C · Lower = cooler','<div class="no-data">No data</div>');
+    const mxI=Math.max(...idleData.map(l=>l[idleK]),1);
+    const mxL=Math.max(...loadData.map(l=>l[loadK]),1);
+    const rows=(arr,k,mx)=>arr.slice(0,15).map(l=>{
+      const v=l[k],p=pct(v,mx);
+      return`<div class="temp-bar-item">
+        <div class="temp-bar-name" title="${l.model}">${l.model}</div>
+        <div class="temp-bar-track"><div class="temp-bar-fill ${tbcls(v)}" style="width:${p}%"></div></div>
+        <div class="temp-val ${tcls(v)}">${v}°C</div>
+      </div>`;}).join('');
+    const body=`<div class="temp-pair">
+      <div class="temp-box"><div class="temp-label">💤 Idle (coolest first)</div>${rows(idleData,idleK,mxI)}</div>
+      <div class="temp-box"><div class="temp-label">🔥 Full Load (coolest first)</div>${rows(loadData,loadK,mxL)}</div>
+    </div>`;
+    return tile(title,icon,'°C · Lower = cooler',body);
   }
+  document.getElementById('thermal-grid').innerHTML=
+    tempTile('CPU Temperature','🧠','cpuIdle','cpuLoad')+
+    tempTile('GPU Temperature','🎮','gpuIdle','gpuLoad');
+}
 
-  scoreOptions.forEach(option => {
-    const chipEl = document.createElement('div');
-    chipEl.className = `score-chip ${sfScoreMetric === option.value ? 'active' : ''}`;
-    chipEl.textContent = option.display;
-    chipEl.onclick = () => {
-      sfScoreMetric = option.value;
-      updateActiveChip(scoreChips, option.display);
-      renderSpecFilter();
-    };
-    scoreChips.appendChild(chipEl);
+function renderPCMark(){
+  const cfgs=[
+    {k:'pcmark', t:'PCMark 10 Overall',   i:'📊',m:'Extended score'},
+    {k:'pcEss',  t:'Essentials',           i:'💼',m:'Web · Video · App launch'},
+    {k:'pcProd', t:'Productivity',         i:'📝',m:'Spreadsheet · Writing'},
+    {k:'pcCC',   t:'Content Creation',     i:'🎨',m:'Photo & video editing'},
+    {k:'pcGaming',t:'Gaming',              i:'🕹️',m:'In-game performance'},
+  ];
+  document.getElementById('pcmark-grid').innerHTML=cfgs.map(c=>tile(c.t,c.i,c.m,barHTML(getF(c.k),c.k))).join('');
+}
+
+let sKey='timeSpy',sDir=-1;
+function srt(k){
+  if(sKey===k)sDir*=-1;else{sKey=k;sDir=-1;}
+  document.querySelectorAll('thead th').forEach(th=>{
+    const ok=th.getAttribute('onclick')==='srt(\''+k+'\')';
+    const base=th.className.replace(/\bs-[ad]\b/g,'').trim();
+    th.className=ok?base+' '+(sDir===-1?'s-d':'s-a'):base;
   });
+  renderTable();
 }
 
-function updateActiveChip(chipsContainer, activeLabel) {
-  const chips = chipsContainer.querySelectorAll('.score-chip');
-  chips.forEach(chip => {
-    if (chip.textContent === activeLabel) {
-      chip.classList.add('active');
-    } else {
-      chip.classList.remove('active');
-    }
+function tclr(v){if(v==null)return'';return v<60?'color:#00d4ff':v<85?'color:#ffb020':'color:#ff4560';}
+
+function renderTable(){
+  const data=[...getData()].sort((a,b)=>{
+    const va=a[sKey]??-Infinity,vb=b[sKey]??-Infinity;
+    if(typeof va==='string')return sDir*va.localeCompare(vb);
+    return sDir*(vb-va);
   });
+  const c=br=>`color:${bc(br)};border-color:${bc(br)}44`;
+  document.getElementById('tbl-body').innerHTML=data.map(l=>`<tr>
+    <td class="sticky-col sticky-col-0"><span class="pill" style="${c(l.brand)}">${l.brand}</span></td>
+    <td class="sticky-col sticky-col-1">${l.model}</td>
+    <td class="sticky-col sticky-col-2 d">${l.spec}</td>
+    <td class="r d sticky-col sticky-col-3">${l.year||'—'}</td>
+    <td class="r">${fmt(l.timeSpy)}</td>
+    <td class="r d">${fmt(l.tsExtreme)}</td>
+    <td class="r d">${fmt(l.fsExt)}</td>
+    <td class="r d">${fmt(l.fsUltra)}</td>
+    <td class="r d">${fmt(l.steelNomad)}</td>
+    <td class="r d">${fmt(l.cbR23S)}</td>
+    <td class="r">${fmt(l.cbR23M)}</td>
+    <td class="r d">${fmt(l.cbR24S)}</td>
+    <td class="r d">${fmt(l.cbR24M)}</td>
+    <td class="r" style="color:${l.battery?'#39ff84':'inherit'}">${l.battery!=null?l.battery.toFixed(2)+'h':'—'}</td>
+    <td class="r d">${l.standby!=null?l.standby.toFixed(2)+'h':'—'}</td>
+    <td class="r" style="${tclr(l.cpuIdle)}">${l.cpuIdle!=null?l.cpuIdle+'°C':'—'}</td>
+    <td class="r" style="${tclr(l.cpuLoad)}">${l.cpuLoad!=null?l.cpuLoad+'°C':'—'}</td>
+    <td class="r" style="${tclr(l.gpuIdle)}">${l.gpuIdle!=null?l.gpuIdle+'°C':'—'}</td>
+    <td class="r" style="${tclr(l.gpuLoad)}">${l.gpuLoad!=null?l.gpuLoad+'°C':'—'}</td>
+  </tr>`).join('');
 }
 
-function sfExtractGpu(spec) {
-  // Extract actual GPU name from spec string
-  const rxMatch = spec.match(/RX\s*\d+/i);
-  if (rxMatch) return rxMatch[0].toUpperCase();
-
-  const rtxMatch = spec.match(/RTX\s*\d+/i);
-  if (rtxMatch) return rtxMatch[0].toUpperCase();
-
-  const radeonMatch = spec.match(/Radeon\s*\w+/i);
-  if (radeonMatch) return radeonMatch[0];
-
-  // Fallback: return first word that looks like GPU
-  const words = spec.split(' ');
-  for (const word of words) {
-    if (word.includes('GTX') || word.includes('RTX') || word.includes('RX') || word.includes('Radeon')) {
-      return word;
-    }
-  }
-  return '';
+function updateHero(){
+  const d=getData();
+  const ts=d.filter(l=>l.timeSpy!=null);
+  const bt=d.filter(l=>l.battery!=null);
+  document.getElementById('s-n').textContent=d.length;
+  document.getElementById('s-b').textContent=[...new Set(d.map(l=>l.brand))].length;
+  document.getElementById('s-ts').textContent=ts.length?Math.max(...ts.map(l=>l.timeSpy)).toLocaleString():'—';
+  document.getElementById('s-bat').textContent=bt.length?Math.max(...bt.map(l=>l.battery)).toFixed(2)+'h':'—';
 }
 
-function sfExtractCpu(spec) {
-  // Extract actual CPU name from spec string
-  const coreMatch = spec.match(/Core\s*Ultra\s*\d+\s*\w*/i) || spec.match(/i[3-9]-\d+/i);
-  if (coreMatch) return coreMatch[0];
-
-  const ryzenMatch = spec.match(/Ryzen\s*\d+/i);
-  if (ryzenMatch) return ryzenMatch[0];
-
-  return '';
+function initSeriesFilter(){
+  const series = [...new Set(D.map(l=>l.series))].filter(Boolean).sort();
+  const sel = document.getElementById('series-filter');
+  if(!sel) return;
+  const currentVal = sel.value;
+  sel.innerHTML = '<option value="ALL">All Series</option>' +
+    series.map(s=>`<option value="${s}">${s}</option>`).join('');
+  sel.value = currentVal;
 }
 
-function renderSpecFilter() {
-  const specRows = document.querySelectorAll('.spec-row');
+function renderAll(){
+  updateHero();
+  renderGPU();
+  renderCPU();
+  renderBattery();
+  renderThermals();
+  renderPCMark();
+  renderTable();
+  compareSet=new Set();
+  renderComparePicker();
+  renderCompareTable();
+}
 
-  specRows.forEach(row => {
-    const spec = row.getAttribute('data-spec') || '';
-    const gpu = sfExtractGpu(spec);
-    const cpu = sfExtractCpu(spec);
+initSeriesFilter();
+renderAll();
 
-    let show = true;
+const NAV=['gpu','cpu','battery','thermals','pcmark','compare','tbl'];
+window.addEventListener('scroll',()=>{
+  const tabs=document.querySelectorAll('.nav-link');
+  let a=0;NAV.forEach((id,i)=>{const el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-120)a=i;});
+  tabs.forEach((t,i)=>t.classList.toggle('active',i===a));
+},{passive:true});
+function goTo(id){document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'})}
 
-    // If no brand selected, show all
-    if (sfSelectedBrands.size === 0) {
-      show = true;
-    } else {
-      // Check based on current tab
-      if (sfIsGpuTab) {
-        // GPU tab: check for NVIDIA or AMD
-        if (sfSelectedBrands.has('NVIDIA')) {
-          show = gpu.includes('RTX');
-        } else if (sfSelectedBrands.has('AMD')) {
-          show = gpu.includes('RX') || gpu.includes('Radeon');
-        } else {
-          show = false;
-        }
-      } else {
-        // CPU tab: check for Intel or AMD
-        if (sfSelectedBrands.has('Intel')) {
-          show = cpu.includes('Core') || cpu.includes('i[3-9]-');
-        } else if (sfSelectedBrands.has('AMD')) {
-          show = cpu.includes('Ryzen');
-        } else {
-          show = false;
-        }
-      }
-    }
 
-    row.style.display = show ? '' : 'none';
-
-    // Update badge colors
-    const badge = row.querySelector('.spec-badge');
-    if (badge) {
-      // Reset badge
-      badge.className = 'spec-badge';
-      badge.style.backgroundColor = 'transparent';
-
-      if (gpu) {
-        if (gpu.includes('RTX')) {
-          badge.classList.add('gpu-badge');
-          badge.style.backgroundColor = '#76b900';
-        } else if (gpu.includes('RX') || gpu.includes('Radeon')) {
-          badge.classList.add('gpu-badge');
-          badge.style.backgroundColor = '#ed1c24';
-        }
-      } else if (cpu) {
-        if (cpu.includes('Core') || cpu.includes('i[3-9]-')) {
-          badge.classList.add('cpu-badge');
-          badge.style.backgroundColor = '#0068b5';
-        } else if (cpu.includes('Ryzen')) {
-          badge.classList.add('cpu-badge');
-          badge.style.backgroundColor = '#ed1c24';
-        }
-      }
-    }
-
-    // Update bar fill color
-    const barFill = row.querySelector('.bar-fill');
-    if (barFill) {
-      if (gpu) {
-        if (gpu.includes('RTX')) {
-          barFill.style.backgroundColor = '#76b900';
-        } else if (gpu.includes('RX') || gpu.includes('Radeon')) {
-          barFill.style.backgroundColor = '#ed1c24';
-        }
-      } else if (cpu) {
-        if (cpu.includes('Core') || cpu.includes('i[3-9]-')) {
-          barFill.style.backgroundColor = '#0068b5';
-        } else if (cpu.includes('Ryzen')) {
-          barFill.style.backgroundColor = '#ed1c24';
-        }
-      }
-    }
+// ── DRAG TO SCROLL ──
+function enableDragScroll(el){
+  if(!el||el._dragEnabled)return;
+  el._dragEnabled=true;
+  let isDown=false,startX=0,scrollLeft=0;
+  el.addEventListener('mousedown',e=>{
+    if(e.target.tagName==='BUTTON'||e.target.tagName==='TH')return;
+    isDown=true;
+    el.classList.add('dragging');
+    startX=e.pageX;
+    scrollLeft=el.scrollLeft;
+    e.preventDefault();
   });
+  window.addEventListener('mouseup',()=>{isDown=false;el.classList.remove('dragging');});
+  el.addEventListener('mousemove',e=>{
+    if(!isDown)return;
+    el.scrollLeft=scrollLeft-(e.pageX-startX)*1.2;
+  });
+  let tX=0,tSL=0;
+  el.addEventListener('touchstart',e=>{tX=e.touches[0].pageX;tSL=el.scrollLeft;},{passive:true});
+  el.addEventListener('touchmove',e=>{el.scrollLeft=tSL-(e.touches[0].pageX-tX);},{passive:true});
 }
 
-// Event listeners for tab switching
-document.addEventListener('DOMContentLoaded', () => {
-  const gpuTab = document.getElementById('gpu-tab');
-  const cpuTab = document.getElementById('cpu-tab');
+function applyDragScrolls(){
+  const tbl=document.querySelector('#tbl .tbl-wrap');
+  if(tbl){tbl.classList.add('drag-scroll');enableDragScroll(tbl);}
+  const cmp=document.querySelector('#compare-tile .tile-body');
+  if(cmp){cmp.classList.add('drag-scroll');enableDragScroll(cmp);}
+}
 
-  if (gpuTab) {
-    gpuTab.addEventListener('click', () => {
-      sfIsGpuTab = true;
-      populateSpecChips();
-      populateScoreChips();
-      renderSpecFilter();
-    });
-  }
+const _origRenderTable=renderTable;
+renderTable=function(){_origRenderTable();setTimeout(()=>{const t=document.querySelector('#tbl .tbl-wrap');if(t){t.classList.add('drag-scroll');enableDragScroll(t);}},0);};
 
-  if (cpuTab) {
-    cpuTab.addEventListener('click', () => {
-      sfIsGpuTab = false;
-      populateSpecChips();
-      populateScoreChips();
-      renderSpecFilter();
-    });
-  }
+const _origRenderCompareTable=renderCompareTable;
+renderCompareTable=function(){_origRenderCompareTable();setTimeout(()=>{const c=document.querySelector('#compare-result');if(c){c.classList.add('drag-scroll');enableDragScroll(c);}},0);};
 
-  // Initialize
-  populateSpecChips();
-  populateScoreChips();
-  renderSpecFilter();
-});
+// init on load
+setTimeout(applyDragScrolls,200);
 </script>
 </body>
 </html>
