@@ -133,7 +133,27 @@ tbody td.d{color:var(--muted)}
 .sf-tgp-btn:hover{color:var(--text)}
 .sf-tgp-btn.active{background:var(--bg3);border-color:var(--muted2);color:var(--text)}
 
-</style>
+
+/* Score chip styles */
+.sf-score-chip{
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  letter-spacing:.06em;
+  padding:5px 14px;
+  border-radius:20px;
+  border:1px solid var(--line2);
+  background:transparent;
+  color:var(--muted2);
+  cursor:pointer;
+  transition:all .15s;
+}
+.sf-score-chip:hover{color:var(--text)}
+.sf-score-chip.active{
+  background:var(--cyan);
+  border-color:var(--cyan);
+  color:#000;
+  font-weight:600;
+}</style>
 </head>
 <body>
 
@@ -267,6 +287,9 @@ tbody td.d{color:var(--muted)}
   <div id="sf-score-label" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem">หมวดคะแนน</div>
   <div id="sf-score-chips" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.2rem"></div>
 
+  <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem">หมวดคะแนน</div>
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap" id="sf-score-chips">
+  </div>
   <div id="sf-tgp-wrap" style="margin-bottom:1.2rem">
     <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem">TGP (วัตต์)</div>
     <div style="display:flex;gap:.5rem;flex-wrap:wrap">
@@ -418,7 +441,7 @@ const D=[
     "brand": "ASUS",
     "series": "ROG",
     "model": "ROG Strix G16",
-    "spec": "Ryzen 9955HX + RTX 5070 12GB 175W",
+    "spec": "Ryzen 9 9955HX + RTX 5070 12GB 140W",
     "year": 2026,
     "timeSpy": 13834.0,
     "tsGfx": 14145.0,
@@ -511,6 +534,39 @@ const D=[
     "cpuIdle": 48.0,
     "cpuLoad": 100.0,
     "gpuIdle": 48.0,
+    "gpuLoad": 83.0
+  },
+  {
+    "brand": "ASUS",
+    "series": "ROG",
+    "model": "ROG Strix G18",
+    "spec": "Core Ultra 9 290HX Plus + RTX 5070 Ti 140W",
+    "year": 2026,
+    "timeSpy": 17519.0,
+    "tsGfx": 17429.0,
+    "tsExtreme": 8742.0,
+    "tsExtremeGfx": 8310.0,
+    "fsExt": 22549.0,
+    "fsExtGfx": 22965.0,
+    "fsExtPhys": 50703.0,
+    "fsUltra": 11640.0,
+    "fsUltraGfx": 11240.0,
+    "fsUltraPhys": 50775.0,
+    "steelNomad": 3905.0,
+    "cbR23S": 2392.0,
+    "cbR23M": 39753.0,
+    "cbR24S": 140.0,
+    "cbR24M": 1980.0,
+    "battery": 4.54,
+    "standby": 14.14,
+    "pcmark": 14706.0,
+    "pcEss": 11594.0,
+    "pcProd": 20927.0,
+    "pcCC": 18090.0,
+    "pcGaming": 28793.0,
+    "cpuIdle": 48.0,
+    "cpuLoad": 100.0,
+    "gpuIdle": 45.0,
     "gpuLoad": 83.0
   },
   {
@@ -1078,7 +1134,7 @@ const D=[
     "brand": "ASUS",
     "series": "TUF & V16",
     "model": "Gaming V16",
-    "spec": "Core 5 210H + 5050 75W",
+    "spec": "Core 5 210H + RTX 5050 75W",
     "year": 2025,
     "timeSpy": 7743.0,
     "tsGfx": 7560.0,
@@ -1903,7 +1959,7 @@ const D=[
     "brand": "Lenovo",
     "series": "LOQ",
     "model": "LOQ 15 Gen 9",
-    "spec": "i5-13450HX + 3050 6GB 95W",
+    "spec": "i5-13450HX + RTX 3050 6GB 95W",
     "year": 2024,
     "timeSpy": 6144.0,
     "tsGfx": 5692.0,
@@ -2428,6 +2484,31 @@ const D=[
     "gpuLoad": 76.0
   }
 ];;
+
+const GPU_SPECS = {
+  'RTX 5090': {cuda:'21760', vram:'24GB GDDR7'},
+  'RTX 5080': {cuda:'10752', vram:'16GB GDDR7'},
+  'RTX 5070 Ti': {cuda:'8960', vram:'16GB GDDR7'},
+  'RTX 5070': {cuda:'6144', vram:'12GB GDDR7'},
+  'RTX 5060': {cuda:'3840', vram:'8GB GDDR7'},
+  'RTX 5050': {cuda:'2560', vram:'8GB GDDR7'},
+  'RTX 4090': {cuda:'16384', vram:'16GB GDDR6'},
+  'RTX 4080': {cuda:'7680', vram:'12GB GDDR6'},
+  'RTX 4070': {cuda:'4608', vram:'8GB GDDR6'},
+  'RTX 4060': {cuda:'3072', vram:'8GB GDDR6'},
+  'RX 8060S': {cuda:'16 CU', vram:'shared'},
+};
+const CPU_SPECS = {
+  'Core Ultra 9 275HX': {cores:'24C', threads:'24T'},
+  'Core Ultra 9 386H': {cores:'18C', threads:'22T'},
+  'Core Ultra 7 265H': {cores:'16C', threads:'22T'},
+  'Core Ultra 5 245H': {cores:'14C', threads:'18T'},
+  'Ryzen AI Max+ 395': {cores:'16C', threads:'32T'},
+  'Ryzen 7 250': {cores:'8C', threads:'16T'},
+  'Ryzen 5 240': {cores:'6C', threads:'12T'},
+  'i9-14900HX': {cores:'24C', threads:'32T'},
+  'i7-14700HX': {cores:'20C', threads:'28T'},
+};
 
 let activeBrand='ALL';
 let activeYear='ALL';
@@ -3036,59 +3117,82 @@ function sfPopulateScores(){
   ).join('');
 }
 function renderSpecFilter(){
-  const vendorFn=sfTab==='gpu'?sfGetGpuVendor:sfGetCpuVendor;
   const extFn=sfTab==='gpu'?sfExtractGpu:sfExtractCpu;
+  const scoreKey=sfScoreMetric;
+  const scoreLabels={
+    'timeSpy':'Time Spy',
+    'tsExtreme':'TS Extreme',
+    'fsExt':'FS Extreme',
+    'fsUltra':'FS Ultra',
+    'steelNomad':'Steel Nomad',
+    'cbR23M':'CB R23 Multi',
+    'cbR24M':'CB R24 Multi',
+    'battery':'Battery',
+    'standby':'Standby'
+  };
+  const scoreLabel=scoreLabels[scoreKey]||scoreKey;
   let filtered=D.filter(l=>{
-    const vendor=vendorFn(l.spec);
-    const model=extFn(l.spec);
+    const spec=extFn(l.spec);
     const tgp=sfExtractTgp(l.spec);
-    const vendorMatch=!sfVendor||vendor===sfVendor;
-    const modelMatch=sfSelectedModels.size===0||sfSelectedModels.has(model);
-    const tgpMatch=sfTab==='cpu'||sfTgpMatch(tgp);
-    return vendorMatch&&modelMatch&&tgpMatch&&l[sfScoreKey]!=null;
-  }).sort((a,b)=>b[sfScoreKey]-a[sfScoreKey]);
-
+    return (sfSelectedSpecs.size===0||sfSelectedSpecs.has(spec))&&(sfTab==='cpu'||sfTgpMatch(tgp))&&l[scoreKey]!=null;
+  }).sort((a,b)=>b[scoreKey]-a[scoreKey]);
   const cnt=document.getElementById('sf-result-count');
   const wrap=document.getElementById('sf-table-wrap');
   const empty=document.getElementById('sf-empty');
-
-  if(filtered.length===0){
-    wrap.style.display='none'; empty.style.display='block';
-    cnt.textContent=sfVendor||sfSelectedModels.size>0?'ไม่พบข้อมูลที่ตรงกัน':'เลือก vendor ด้านบนเพื่อดูผลเปรียบเทียบ';
-    return;
-  }
-  wrap.style.display='block'; empty.style.display='none';
-  const modelList=sfSelectedModels.size>0?[...sfSelectedModels].join(' / '):(sfVendor||'ทั้งหมด');
-  cnt.textContent=`แสดง ${filtered.length} รุ่น · ${modelList} · ${SF_SCORE_LABELS[sfScoreKey]||sfScoreKey}`;
-
-  const maxScore=filtered[0][sfScoreKey];
-  const isGpu=sfTab==='gpu';
-  document.getElementById('sf-thead').innerHTML=`<th>รุ่น</th><th>${isGpu?'GPU':'CPU'}</th><th style="min-width:200px">${SF_SCORE_LABELS[sfScoreKey]}</th>${isGpu?'<th style="text-align:center">TGP</th>':''}<th style="text-align:right">% ความต่าง</th>`;
-
+  if(filtered.length===0){wrap.style.display='none';empty.style.display='block';cnt.textContent=sfSelectedSpecs.size===0?'เลือก spec ด้านบนเพื่อดูผลเปรียบเทียบ':'ไม่พบข้อมูลที่ตรงกัน';return;}
+  wrap.style.display='block';empty.style.display='none';
+  const specList=sfSelectedSpecs.size>0?[...sfSelectedSpecs].join(' / '):'ทั้งหมด';
+  cnt.textContent=`แสดง ${filtered.length} รุ่น · ${specList}`;
+  const maxScore=filtered[0][scoreKey];
+  document.getElementById('sf-thead').innerHTML=`<tr><th>รุ่น</th><th>${sfTab==='gpu'?'GPU':'CPU'}</th><th style="min-width:220px">${scoreLabel}</th>${sfTab==='gpu'?'<th style="text-align:center">TGP</th>':''}<th style="text-align:right">% ความต่าง</th></tr>`;
   document.getElementById('sf-tbody').innerHTML=filtered.map((l,idx)=>{
-    const gpuName=sfExtractGpu(l.spec)||'';
-    const cpuName=sfExtractCpu(l.spec)||'';
-    const specName=isGpu?gpuName:cpuName;
-    const vendor=vendorFn(l.spec)||'';
-    const vc=VENDOR_COLORS[vendor]||'#888';
+    const spec=extFn(l.spec)||'—';
     const tgp=sfExtractTgp(l.spec);
-    const score=l[sfScoreKey];
+    const score=l[scoreKey];
     const pct=(score/maxScore)*100;
     const diff=idx===0?'100%':`-${(100-pct).toFixed(1)}%`;
     const diffColor=idx===0?'var(--cyan)':'var(--red)';
-    const topBadge=idx===0?`<span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;background:rgba(200,169,110,.12);color:var(--cyan);margin-left:5px;font-family:'JetBrains Mono',monospace">top</span>`:'';
-    let detail='';
-    if(isGpu){
-      const gk=Object.keys(GPU_SPECS).find(k=>gpuName.includes(k));
-      if(gk) detail=`<div style="font-size:11px;color:var(--muted);margin-top:2px">CUDA: ${GPU_SPECS[gk].cuda} · VRAM: ${GPU_SPECS[gk].vram}</div>`;
+    const topBadge=idx===0?`<span style="display:inline-block;padding:1px 7px;border-radius:3px;font-size:11px;background:rgba(200,169,110,.15);color:var(--cyan);margin-left:6px;font-family:'JetBrains Mono',monospace">top</span>`:'';
+    const brandC=bc(l.brand);
+    const tgpCell=sfTab==='gpu'?`<td style="text-align:center;color:var(--muted2);font-family:'JetBrains Mono',monospace;font-size:14px">${tgp!=null?tgp+'W':'—'}</td>`:'';
+
+    // Add spec details (CUDA cores/VRAM for GPU, cores/threads for CPU)
+    let specDetail = '';
+    if (sfTab === 'gpu') {
+      const gpuMatch = Object.keys(GPU_SPECS).find(key => spec.includes(key));
+      if (gpuMatch) {
+        const specInfo = GPU_SPECS[gpuMatch];
+        specDetail = `<div style="font-size:11px;color:var(--muted);margin-top:2px;">CUDA: ${specInfo.cuda} | VRAM: ${specInfo.vram}</div>`;
+      }
     } else {
-      const ck=Object.keys(CPU_SPECS).find(k=>l.spec&&l.spec.includes(k));
-      if(ck) detail=`<div style="font-size:11px;color:var(--muted);margin-top:2px">${CPU_SPECS[ck].cores} · ${CPU_SPECS[ck].threads}</div>`;
+      const cpuMatch = Object.keys(CPU_SPECS).find(key => spec.includes(key));
+      if (cpuMatch) {
+        const specInfo = CPU_SPECS[cpuMatch];
+        specDetail = `<div style="font-size:11px;color:var(--muted);margin-top:2px;">Cores: ${specInfo.cores} | Threads: ${specInfo.threads}</div>`;
+      }
     }
-    const badge=`<span style="font-family:'JetBrains Mono',monospace;font-size:11px;padding:1px 8px;border-radius:3px;border:1px solid ${vc}44;color:${vc};background:${vc}11">${specName||'—'}</span>`;
-    const tgpCell=isGpu?`<td style="text-align:center;color:var(--muted2);font-family:'JetBrains Mono',monospace;font-size:13px">${tgp!=null?tgp+'W':'—'}</td>`:'';
-    return `<tr><td><div style="font-weight:600;font-size:14px">${l.model}${topBadge}</div><div style="font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace">${l.brand} · ${l.year||''}</div>${detail}</td><td>${badge}</td><td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;min-width:80px"><div style="height:100%;width:${pct.toFixed(1)}%;background:${vc};border-radius:2px"></div></div><span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;min-width:52px;text-align:right">${fmt(score)}</span></div></td>${tgpCell}<td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:${diffColor}">${diff}</td></tr>`;
+
+    return `<tr><td><div style="font-weight:600;font-size:15px">${l.model}${topBadge}</div><div style="font-size:13px;color:var(--muted);font-family:'JetBrains Mono',monospace">${l.brand} · ${l.year||''}</div>${specDetail}</td><td><span style="font-family:'JetBrains Mono',monospace;font-size:12px;padding:2px 9px;border-radius:3px;border:1px solid ${brandC}44;color:${brandC};background:${brandC}11">${spec}</span></td><td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;min-width:80px"><div style="height:100%;width:${pct.toFixed(1)}%;background:var(--cyan);border-radius:3px"></div></div><span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;min-width:54px;text-align:right">${fmt(score)}</span></div></td>${tgpCell}<td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;color:${diffColor}">${diff}</td></tr>`;
   }).join('');
+
+  // Render score chips
+  const scoreOptions = [
+    {key:'timeSpy', label:'Time Spy'},
+    {key:'tsExtreme', label:'TS Extreme'},
+    {key:'fsExt', label:'FS Extreme'},
+    {key:'fsUltra', label:'FS Ultra'},
+    {key:'steelNomad', label:'Steel Nomad'},
+    {key:'cbR23M', label:'CB R23 Multi'},
+    {key:'cbR24M', label:'CB R24 Multi'},
+    {key:'battery', label:'Battery'},
+    {key:'standby', label:'Standby'}
+  ];
+  document.getElementById('sf-score-chips').innerHTML=scoreOptions.map(opt=>`
+    <button class="sf-score-chip${sfScoreMetric===opt.key?' active':''}"
+            data-key="${opt.key}"
+            onclick="sfSetScore(this,'${opt.key}')">
+      ${opt.label}
+    </button>`).join('');
 }
 function initSpecFilter(){sfPopulateVendors();sfPopulateModels();sfPopulateScores();renderSpecFilter();}
 // ─────────────────────────────────────────────────────────────
