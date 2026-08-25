@@ -1,0 +1,98 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+    --bg-primary: #0c0c0e;
+    --color-accent: #c8a96e;
+}
+
+body {
+    background-color: var(--bg-primary);
+    font-family: 'Space Grotesk', sans-serif;
+    padding: 20px;
+}
+
+.spec-filter-container {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.gpu-chip {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 120px; /* กำหนดขนาดคงที่สำหรับชิป */
+    height: 80px;
+    padding: 10px;
+    border-radius: 50%;
+    background-color: #1a1a1e; /* สีพื้นหลังของชิปที่ไม่ active */
+    color: #ffffff;
+    transition: all 0.2s ease;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border: 2px solid transparent;
+}
+
+.gpu-chip span {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+.gpu-chip .score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    margin-top: 3px;
+    opacity: 0.7;
+}
+
+/* State: Hover Glow */
+.gpu-chip:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 15px rgba(200, 169, 110, 0.4); /* Glow effect using accent color */
+    background-color: #18181c;
+}
+
+/* State: Active (Gold Fill) */
+.gpu-chip.active {
+    background-color: var(--color-accent);
+    color: #0c0c0e; /* ข้อความต้องเป็นสีเข้มเมื่อพื้นหลังเป็นทอง */
+    box-shadow: 0 0 15px rgba(200, 169, 110, 0.8);
+    border-color: var(--color-accent);
+}
+
+.gpu-chip.active span {
+    color: #0c0c0e;
+}
+
+/* Media Query for responsiveness */
+@media (max-width: 768px) {
+    .gpu-chip {
+        width: 100px;
+        height: 70px;
+    }
+}
+</style>
+
+<div class="spec-filter-container">
+    <!-- Chip 1: Active Example -->
+    <div class="gpu-chip active" data-gpu="{{GPU_NAME}}">
+        <span>{{GPU_NAME}}</span>
+        <span class="score">Score: {{GPU_SCORE}}</span>
+    </div>
+
+    <!-- Chip 2: Inactive Example -->
+    <div class="gpu-chip" data-gpu="{{GPU_NAME}}">
+        <span>{{GPU_NAME}}</span>
+        <span class="score">Score: {{GPU_SCORE}}</span>
+    </div>
+
+    <!-- Chip 3: Another GPU Model -->
+    <div class="gpu-chip" data-gpu="{{GPU_NAME}}">
+        <span>{{GPU
