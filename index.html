@@ -49,10 +49,10 @@ nav{position:sticky;top:0;z-index:200;background:rgba(8,11,16,.92);backdrop-filt
 .brand-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
 main{padding:3rem 2rem;max-width:1440px;margin:0 auto}
 .section{margin-bottom:4rem}
-.section-header{display:flex;align-items:flex-end;gap:1rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.section-idx{font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--cyan);letter-spacing:.14em}
+.section-header{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.5rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--line)}
+.section-icon{font-size:1.8rem;line-height:1}
 .section-name{font-family:'Rajdhani',sans-serif;font-size:2.8rem;font-weight:700;letter-spacing:-.01em;line-height:1}
-.section-sub{margin-left:auto;font-size:16px;color:var(--muted);text-align:right;max-width:280px}
+.section-sub{margin:0 auto;font-size:16px;color:var(--muted);text-align:center;max-width:480px}
 .tile-grid{display:grid;gap:1rem}
 .tile-grid-2{grid-template-columns:repeat(auto-fit,minmax(360px,1fr))}
 .tile{background:var(--bg1);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:border-color .2s,transform .15s}
@@ -79,7 +79,9 @@ main{padding:3rem 2rem;max-width:1440px;margin:0 auto}
 .temp-box{background:var(--bg2);border-radius:5px;padding:.65rem .8rem}
 .temp-label{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
 .temp-bar-item{display:flex;align-items:center;gap:6px;margin-bottom:4px}
-.temp-bar-name{font-size:13px;color:var(--muted2);width:180px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.temp-bar-name{width:220px;flex-shrink:0;overflow:hidden}
+.temp-model{font-size:13px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.temp-spec{font-size:10px;color:var(--muted);opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'JetBrains Mono',monospace;margin-top:1px}
 .temp-bar-track{flex:1;height:6px;background:var(--bg3);border-radius:2px;overflow:hidden}
 .temp-bar-fill{height:100%;border-radius:2px;transition:width .5s ease}
 .temp-val{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;width:50px;text-align:right}
@@ -153,14 +155,62 @@ tbody td.d{color:var(--muted)}
   border-color:var(--cyan);
   color:#000;
   font-weight:600;
-}</style>
+}
+
+
+.landing-podium-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;text-align:center;margin:2.2rem 0 .3rem}
+.landing-podium-sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);opacity:.6;text-align:center;margin-bottom:1.4rem}
+.landing-podium{display:flex;align-items:flex-end;justify-content:center;gap:10px;padding:0 1.5rem}
+.lp-col{text-align:center}
+.lp-rank{border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .5rem;font-family:'JetBrains Mono',monospace;font-weight:600}
+.lp-name{font-family:'Rajdhani',sans-serif;font-weight:700;margin-bottom:1px;color:var(--text)}
+.lp-meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:.6rem}
+.lp-bar{border-radius:6px 6px 0 0}
+.lp1{width:190px}
+.lp1 .lp-rank{width:64px;height:64px;font-size:19px;background:rgba(200,169,110,.18);color:var(--cyan)}
+.lp1 .lp-name{font-size:19px}
+.lp1 .lp-bar{height:130px;background:var(--bg2);border:1px solid var(--cyan);border-top:4px solid var(--cyan)}
+.lp-crown{font-size:24px;margin-bottom:4px}
+.lp2,.lp3{width:170px}
+.lp2 .lp-rank{width:54px;height:54px;font-size:14px;background:rgba(200,169,110,.1);color:var(--muted2)}
+.lp2 .lp-name{font-size:14px}
+.lp2 .lp-bar{height:95px;background:var(--bg2);border:1px solid var(--line2);border-top:3px solid var(--muted2)}
+.lp3 .lp-rank{width:54px;height:54px;font-size:14px;background:rgba(200,169,110,.08);color:#997d52}
+.lp3 .lp-name{font-size:14px}
+.lp3 .lp-bar{height:70px;background:var(--bg2);border:1px solid var(--line2);border-top:3px solid #997d52}
+
+
+.landing-tiles{display:grid;grid-template-columns:repeat(3,minmax(150px,1fr));gap:12px;max-width:660px;margin:2.2rem auto 0;padding:0 1.5rem}
+@media(max-width:640px){.landing-tiles{grid-template-columns:repeat(2,1fr)}}
+.landing-tile{background:var(--bg1);border:1px solid var(--line);border-radius:var(--r);padding:1.2rem 1rem;text-align:center;cursor:pointer;position:relative;overflow:hidden;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.landing-tile:hover{transform:translateY(-4px) scale(1.03);border-color:var(--cyan);box-shadow:0 8px 24px rgba(200,169,110,.15)}
+.landing-tile-icon{font-size:1.5rem;margin-bottom:.5rem;display:block}
+.landing-tile-name{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:600;color:var(--text);letter-spacing:.01em}
+
+
+.view-breadcrumb{display:flex;align-items:center;gap:.5rem;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);letter-spacing:.04em;padding:1.5rem 1.5rem 0;max-width:1200px;margin:0 auto}
+.breadcrumb-home{color:var(--cyan);cursor:pointer;transition:opacity .15s}
+.breadcrumb-home:hover{opacity:.7}
+.breadcrumb-sep{color:var(--muted);opacity:.5}
+.breadcrumb-current{color:var(--text)}
+
+
+@keyframes viewFadeIn{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
+.view-anim{animation:viewFadeIn .28s ease}
+
+
+.landing-podium.podium-pre{opacity:0}
+@keyframes podiumPop{0%{opacity:0;transform:scale(.7) translateY(20px)}60%{opacity:1;transform:scale(1.05) translateY(-4px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+.landing-podium.podium-pop{animation:podiumPop .6s cubic-bezier(.34,1.56,.64,1) forwards}
+
+</style>
 </head>
 <body>
 
-<div class="hero">
+<div class="hero" id="hero-view">
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
-  <div class="hero-tag">Gaming Laptop Performance Database 2024–2026</div>
+  <div class="hero-tag">Gaming Laptop Performance Database</div>
   <h1 class="hero-title">
     <span>LAPTOP</span>
     <span>BENCHMARK</span>
@@ -169,13 +219,17 @@ tbody td.d{color:var(--muted)}
   <div class="hero-meta">
     <div class="hero-stat"><div class="hero-stat-n" id="s-n">—</div><div class="hero-stat-l">Laptops</div></div>
     <div class="hero-stat"><div class="hero-stat-n" id="s-b">5</div><div class="hero-stat-l">Brands</div></div>
-    <div class="hero-stat"><div class="hero-stat-n" id="s-ts">—</div><div class="hero-stat-l">Best Time Spy</div></div>
-    <div class="hero-stat"><div class="hero-stat-n" id="s-bat">—</div><div class="hero-stat-l">Best Battery</div></div>
-  </div>
-  <div class="scroll-cue"><span>Explore below</span><div class="scroll-cue-line"></div></div>
+    </div>
+  
+  <div class="landing-tiles" id="landing-tiles"></div>
+  <div class="landing-podium-label">Overall Ranking</div>
+  <div class="landing-podium-sub">คำนวณจาก Weighted Score ทุกหมวดรวมกัน</div>
+  <div class="landing-podium" id="landing-podium"></div>
+
+  
 </div>
 
-<nav>
+<nav id="top-nav">
   <div class="nav-brand">BENCHMARK</div>
   <div class="nav-links">
     <button class="nav-link active" onclick="goTo('gpu')">GPU</button>
@@ -188,7 +242,7 @@ tbody td.d{color:var(--muted)}
   </div>
 </nav>
 
-<div class="brand-bar">
+<div class="brand-bar" id="brand-bar-view">
   <div class="brand-bar-inner">
     <div class="filter-group">
       <span class="brand-label">Brand ·</span>
@@ -219,10 +273,11 @@ tbody td.d{color:var(--muted)}
   </div>
 </div>
 
-<main>
+<main id="main-view">
+<div class="view-breadcrumb" id="view-breadcrumb"></div>
 <div class="section" id="gpu">
   <div class="section-header">
-    <span class="section-idx">01 —</span>
+    <span class="section-icon">📊</span>
     <h2 class="section-name">GPU Benchmark / 3DMark</h2>
     <span class="section-sub">Higher score = better GPU · Percentage vs top score</span>
   </div>
@@ -231,7 +286,7 @@ tbody td.d{color:var(--muted)}
 
 <div class="section" id="cpu">
   <div class="section-header">
-    <span class="section-idx">02 —</span>
+    <span class="section-icon">🔧</span>
     <h2 class="section-name">CPU Test / Cinebench</h2>
     <span class="section-sub">Higher = faster CPU processing</span>
   </div>
@@ -240,7 +295,7 @@ tbody td.d{color:var(--muted)}
 
 <div class="section" id="battery">
   <div class="section-header">
-    <span class="section-idx">03 —</span>
+    <span class="section-icon">🔋</span>
     <h2 class="section-name">Battery Test</h2>
     <span class="section-sub">Social + YouTube usage · Standby hours</span>
   </div>
@@ -249,7 +304,7 @@ tbody td.d{color:var(--muted)}
 
 <div class="section" id="thermals">
   <div class="section-header">
-    <span class="section-idx">04 —</span>
+    <span class="section-icon">🌡️</span>
     <h2 class="section-name">Cooling Test / Thermals</h2>
     <span class="section-sub">Turbo mode · Room 25°C avg · Lower = cooler</span>
   </div>
@@ -258,7 +313,7 @@ tbody td.d{color:var(--muted)}
 
 <div class="section" id="pcmark">
   <div class="section-header">
-    <span class="section-idx">05 —</span>
+    <span class="section-icon">💻</span>
     <h2 class="section-name">PCMark 10 / Extended</h2>
     <span class="section-sub">Real-world productivity benchmark</span>
   </div>
@@ -269,7 +324,7 @@ tbody td.d{color:var(--muted)}
 
 <div class="section" id="spec-filter">
   <div class="section-header">
-    <span class="section-idx">06 —</span>
+    <span class="section-icon">⚙️</span>
     <h2 class="section-name">Spec Filter</h2>
     <span class="section-sub">เลือก GPU หรือ CPU แล้วดูเปรียบเทียบทุกรุ่นที่ใช้สเปคนั้น</span>
   </div>
@@ -309,10 +364,11 @@ tbody td.d{color:var(--muted)}
 
 <div class="section" id="compare">
   <div class="section-header">
-    <span class="section-idx">06 —</span>
+    <span class="section-icon">🆚</span>
     <h2 class="section-name">Direct Comparison</h2>
-    <span class="section-sub">Select up to 6 laptops to compare side by side · <span id="compare-count">0 selected</span></span>
+    <span class="section-sub">Select up to 6 laptops to compare side by side · <span id="compare-count">0 selected</span> · <span class="breadcrumb-home" onclick="clearCompareSelection()" style="text-decoration:underline">Clear selection</span></span>
   </div>
+  <div id="compare-brand-chips" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem;align-items:center"></div>
   <div id="compare-picker" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem"></div>
   <div id="compare-result" class="tbl-wrap" style="display:none">
     <table id="compare-table">
@@ -324,7 +380,7 @@ tbody td.d{color:var(--muted)}
 
 <div class="section" id="tbl">
   <div class="section-header">
-    <span class="section-idx">07 —</span>
+    <span class="section-icon">📋</span>
     <h2 class="section-name">Full Benchmark Data</h2>
     <span class="section-sub">Click headers to sort · Exact CSV values only</span>
   </div>
@@ -2607,9 +2663,10 @@ const getF=k=>getData().filter(l=>l[k]!=null).sort((a,b)=>b[k]-a[k]);
 // ── COMPARE (defined first so renderAll can call it) ──
 const COMPARE_MAX=6;
 let compareSet=new Set();
+let cmpBrandFilter='ALL';
 
 function renderComparePicker(){
-  const d=getData();
+  const d=cmpBrandFilter==='ALL'?D:D.filter(l=>l.brand===cmpBrandFilter);
   const container=document.getElementById('compare-picker');
   if(!container)return;
 
@@ -2645,6 +2702,28 @@ function renderComparePicker(){
 
   container.innerHTML=html||'<div class="no-data">No laptops match filters</div>';
   document.getElementById('compare-count').textContent=compareSet.size+' / 6 selected';
+}
+
+function renderCompareBrandChips(){
+  const el=document.getElementById('compare-brand-chips');
+  if(!el) return;
+  const brands=[...new Set(D.map(l=>l.brand))].sort();
+  const chips=['ALL',...brands];
+  el.innerHTML=chips.map(b=>{
+    const active=cmpBrandFilter===b;
+    const c=b==='ALL'?'var(--cyan)':bc(b);
+    return `<button onclick="setCmpBrand('${b}')" style="font-family:'JetBrains Mono',monospace;font-size:12px;padding:4px 12px;border-radius:20px;cursor:pointer;transition:all .15s;border:1px solid ${active?c:'var(--line2)'};background:${active?c+'22':'transparent'};color:${active?c:'var(--muted2)'};font-weight:${active?'600':'400'}">${b}</button>`;
+  }).join('');
+}
+function setCmpBrand(b){
+  cmpBrandFilter=b;
+  renderCompareBrandChips();
+  renderComparePicker();
+}
+function clearCompareSelection(){
+  compareSet=new Set();
+  renderComparePicker();
+  renderCompareTable();
 }
 
 function toggleCompare(key){
@@ -2885,10 +2964,13 @@ function renderThermals(){
     if(!idleData.length&&!loadData.length)return tile(title,icon,'°C · Lower = cooler','<div class="no-data">No data</div>');
     const mxI=Math.max(...idleData.map(l=>l[idleK]),1);
     const mxL=Math.max(...loadData.map(l=>l[loadK]),1);
-    const rows=(arr,k,mx)=>arr.slice(0,15).map(l=>{
+    const rows=(arr,k,mx)=>arr.map(l=>{
       const v=l[k],p=pct(v,mx);
       return`<div class="temp-bar-item">
-        <div class="temp-bar-name" title="${l.model}">${l.model}</div>
+        <div class="temp-bar-name" title="${l.model} — ${l.spec||''}">
+          <div class="temp-model">${l.model}</div>
+          <div class="temp-spec">${l.spec||''}</div>
+        </div>
         <div class="temp-bar-track"><div class="temp-bar-fill ${tbcls(v)}" style="width:${p}%"></div></div>
         <div class="temp-val ${tcls(v)}">${v}°C</div>
       </div>`;}).join('');
@@ -2963,8 +3045,8 @@ function updateHero(){
   const bt=d.filter(l=>l.battery!=null);
   document.getElementById('s-n').textContent=d.length;
   document.getElementById('s-b').textContent=[...new Set(d.map(l=>l.brand))].length;
-  document.getElementById('s-ts').textContent=ts.length?Math.max(...ts.map(l=>l.timeSpy)).toLocaleString():'—';
-  document.getElementById('s-bat').textContent=bt.length?Math.max(...bt.map(l=>l.battery)).toFixed(2)+'h':'—';
+  const _sts=document.getElementById('s-ts');if(_sts)_sts.textContent=ts.length?Math.max(...ts.map(l=>l.timeSpy)).toLocaleString():'—';
+  const _sbat=document.getElementById('s-bat');if(_sbat)_sbat.textContent=bt.length?Math.max(...bt.map(l=>l.battery)).toFixed(2)+'h':'—';
 }
 
 function initSeriesFilter(){
@@ -2986,20 +3068,85 @@ function renderAll(){
   renderPCMark();
   renderTable();
   compareSet=new Set();
+  renderCompareBrandChips();
   renderComparePicker();
   renderCompareTable();
+  if(typeof currentView!=='undefined' && typeof FILTER_VIEWS!=='undefined' && FILTER_VIEWS.includes(currentView)){
+    const activeSection=document.getElementById(currentView);
+    if(activeSection){
+      activeSection.classList.remove('view-anim');
+      void activeSection.offsetWidth;
+      activeSection.classList.add('view-anim');
+    }
+  }
 }
 
+const ALL_VIEWS=['gpu','cpu','battery','thermals','pcmark','spec-filter','compare','tbl'];
+const FILTER_VIEWS=['gpu','cpu','thermals','battery','pcmark'];
+let currentView='home';
 initSeriesFilter();
 renderAll();
 
-const NAV=['gpu','cpu','battery','thermals','pcmark','compare','tbl'];
-window.addEventListener('scroll',()=>{
-  const tabs=document.querySelectorAll('.nav-link');
-  let a=0;NAV.forEach((id,i)=>{const el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-120)a=i;});
-  tabs.forEach((t,i)=>t.classList.toggle('active',i===a));
-},{passive:true});
-function goTo(id){document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'})}
+
+function navigateTo(id){
+  location.hash = id ? '#/'+id : '#/';
+}
+
+const VIEW_LABELS={gpu:'3DMark',cpu:'Cinebench',battery:'Battery Test',thermals:'Thermal',pcmark:'PCMark 10','spec-filter':'Spec Filter',compare:'Direct Comparison',tbl:'Full Data'};
+
+function showView(id){
+  currentView = id && ALL_VIEWS.includes(id) ? id : 'home';
+
+  const heroEl = document.getElementById('hero-view');
+  const barEl = document.getElementById('brand-bar-view');
+  const mainEl = document.getElementById('main-view');
+  const crumbEl = document.getElementById('view-breadcrumb');
+  const navEl = document.getElementById('top-nav');
+
+  if(currentView === 'home'){
+    if(heroEl) heroEl.style.display = '';
+    if(barEl) barEl.style.display = 'none';
+    if(mainEl) mainEl.style.display = 'none';
+    if(navEl) navEl.style.display = 'none';
+    if(typeof clearFilters === 'function') clearFilters();
+  } else {
+    if(navEl) navEl.style.display = '';
+    if(heroEl) heroEl.style.display = 'none';
+    if(barEl) barEl.style.display = FILTER_VIEWS.includes(currentView) ? '' : 'none';
+    if(mainEl) mainEl.style.display = '';
+    ALL_VIEWS.forEach(sid=>{
+      const el = document.getElementById(sid);
+      if(el) el.style.display = (sid === currentView) ? '' : 'none';
+    });
+    if(crumbEl){
+      const label = VIEW_LABELS[currentView] || currentView;
+      crumbEl.innerHTML = `<span class="breadcrumb-home" onclick="navigateTo('')">หน้าแรก</span><span class="breadcrumb-sep">/</span><span class="breadcrumb-current">${label}</span>`;
+    }
+  }
+
+  document.querySelectorAll('.nav-link').forEach(btn=>{
+    const m = btn.getAttribute('onclick') || '';
+    const match = m.match(/goTo\('([^']+)'\)/);
+    btn.classList.toggle('active', !!match && match[1] === currentView);
+  });
+
+  const animTarget = currentView === 'home' ? heroEl : mainEl;
+  if(animTarget){
+    animTarget.classList.remove('view-anim');
+    void animTarget.offsetWidth;
+    animTarget.classList.add('view-anim');
+  }
+
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+function goTo(id){ navigateTo(id); }
+
+function routeFromHash(){
+  const h = location.hash.replace(/^#\/?/, '');
+  showView(h);
+}
+window.addEventListener('hashchange', routeFromHash);
 
 
 // ── DRAG TO SCROLL ──
@@ -3243,7 +3390,102 @@ function renderSpecFilter(){
 function initSpecFilter(){sfPopulateVendors();sfPopulateModels();sfPopulateScores();renderSpecFilter();}
 // ─────────────────────────────────────────────────────────────
 
+
+// ── LANDING: CATEGORY TILES ─────────────────────────────────
+const CATEGORY_TILES=[
+  {icon:'📊',name:'3DMark',id:'gpu'},
+  {icon:'🔧',name:'Cinebench',id:'cpu'},
+  {icon:'🌡️',name:'Thermal',id:'thermals'},
+  {icon:'🔋',name:'Battery',id:'battery'},
+  {icon:'💻',name:'PCMark 10',id:'pcmark'},
+  {icon:'⚙️',name:'Spec Filter',id:'spec-filter'},
+];
+function renderTiles(){
+  const el=document.getElementById('landing-tiles');
+  if(!el) return;
+  el.innerHTML=CATEGORY_TILES.map(t=>
+    `<div class="landing-tile" onclick="goTo('${t.id}')"><div class="landing-tile-icon">${t.icon}</div><div class="landing-tile-name">${t.name}</div></div>`
+  ).join('');
+}
+
+// ── LANDING: WEIGHTED-SCORE PODIUM ──────────────────────────
+const WEIGHTS={gpu:0.30,cpu:0.25,battery:0.20,thermal:0.15,pcmark:0.10};
+
+function calcWeightedScore(laptops){
+  const withGpu=laptops.filter(l=>l.timeSpy!=null);
+  const withCpu=laptops.filter(l=>l.cbR23M!=null);
+  const withBat=laptops.filter(l=>l.battery!=null);
+  const withPcm=laptops.filter(l=>l.pcmark!=null);
+  const withThermal=laptops.filter(l=>l.cpuLoad!=null&&l.gpuLoad!=null);
+
+  const maxGpu=withGpu.length?Math.max(...withGpu.map(l=>l.timeSpy)):1;
+  const maxCpu=withCpu.length?Math.max(...withCpu.map(l=>l.cbR23M)):1;
+  const maxBat=withBat.length?Math.max(...withBat.map(l=>l.battery)):1;
+  const maxPcm=withPcm.length?Math.max(...withPcm.map(l=>l.pcmark)):1;
+
+  let minThermal=0,maxThermal=1;
+  if(withThermal.length){
+    const avgs=withThermal.map(l=>(l.cpuLoad+l.gpuLoad)/2);
+    minThermal=Math.min(...avgs);
+    maxThermal=Math.max(...avgs);
+  }
+
+  return laptops.map(l=>{
+    let score=0,totalWeight=0;
+    if(l.timeSpy!=null){score+=(l.timeSpy/maxGpu*100)*WEIGHTS.gpu;totalWeight+=WEIGHTS.gpu;}
+    if(l.cbR23M!=null){score+=(l.cbR23M/maxCpu*100)*WEIGHTS.cpu;totalWeight+=WEIGHTS.cpu;}
+    if(l.battery!=null){score+=(l.battery/maxBat*100)*WEIGHTS.battery;totalWeight+=WEIGHTS.battery;}
+    if(l.pcmark!=null){score+=(l.pcmark/maxPcm*100)*WEIGHTS.pcmark;totalWeight+=WEIGHTS.pcmark;}
+    if(l.cpuLoad!=null&&l.gpuLoad!=null&&maxThermal>minThermal){
+      const avgLoad=(l.cpuLoad+l.gpuLoad)/2;
+      const thermalScore=100-((avgLoad-minThermal)/(maxThermal-minThermal)*100);
+      score+=thermalScore*WEIGHTS.thermal;totalWeight+=WEIGHTS.thermal;
+    }
+    const weightedScore=totalWeight>0?score/totalWeight*100/100*100/100*(100/(totalWeight*100)*totalWeight*100)/100:0;
+    const finalScore=totalWeight>0?(score/totalWeight):0;
+    return {...l,weightedScore:finalScore};
+  }).sort((a,b)=>b.weightedScore-a.weightedScore);
+}
+
+function renderPodium(){
+  const el=document.getElementById('landing-podium');
+  if(!el) return;
+  if(typeof D==='undefined'||!D.length) return;
+  const ranked=calcWeightedScore(D);
+  const top3=ranked.slice(0,3);
+  if(top3.length<3){el.innerHTML='';return;}
+  const order=[top3[1],top3[0],top3[2]];
+  const classes=['lp2','lp1','lp3'];
+  const ranks=[2,1,3];
+  el.innerHTML=order.map((l,i)=>{
+    const cls=classes[i],rank=ranks[i];
+    const crown=rank===1?'<div class="lp-crown">👑</div>':'';
+    return `<div class="lp-col ${cls}">${crown}<div class="lp-rank">${rank}</div><div class="lp-name">${l.model}</div><div class="lp-meta">${l.brand} · ${l.weightedScore.toFixed(1)} pts</div><div class="lp-bar"></div></div>`;
+  }).join('');
+}
+// ─────────────────────────────────────────────────────────────
+
 initSpecFilter();
+function setupPodiumScrollAnim(){
+  const podiumEl=document.getElementById('landing-podium');
+  if(!podiumEl||!('IntersectionObserver' in window)) return;
+  podiumEl.classList.add('podium-pre');
+  const obs=new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        podiumEl.classList.remove('podium-pre');
+        podiumEl.classList.add('podium-pop');
+        obs.unobserve(podiumEl);
+      }
+    });
+  },{threshold:0.3});
+  obs.observe(podiumEl);
+}
+renderTiles();
+renderPodium();
+setupPodiumScrollAnim();
+routeFromHash();
+
 </script>
 </body>
 </html>
