@@ -79,7 +79,7 @@ main{padding:3rem 2rem;max-width:1440px;margin:0 auto}
 .temp-box{background:var(--bg2);border-radius:5px;padding:.65rem .8rem}
 .temp-label{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
 .temp-bar-item{display:flex;align-items:center;gap:6px;margin-bottom:4px}
-.temp-bar-name{width:220px;flex-shrink:0;overflow:hidden}
+.temp-bar-name{overflow:hidden}
 .temp-model{font-size:13px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .temp-spec{font-size:10px;color:var(--muted);opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'JetBrains Mono',monospace;margin-top:1px}
 .temp-bar-track{flex:1;height:6px;background:var(--bg3);border-radius:2px;overflow:hidden}
@@ -203,6 +203,12 @@ tbody td.d{color:var(--muted)}
 @keyframes podiumPop{0%{opacity:0;transform:scale(.7) translateY(20px)}60%{opacity:1;transform:scale(1.05) translateY(-4px)}100%{opacity:1;transform:scale(1) translateY(0)}}
 .landing-podium.podium-pop{animation:podiumPop .6s cubic-bezier(.34,1.56,.64,1) forwards}
 
+
+.temp-table-head{display:grid;grid-template-columns:1fr 90px 90px;gap:8px;padding:6px 0;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);margin-bottom:4px}
+.temp-table-row{display:grid;grid-template-columns:1fr 90px 90px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.temp-table-row:last-child{border-bottom:none}
+.temp-table-cell{text-align:right;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500}
+
 </style>
 </head>
 <body>
@@ -210,15 +216,14 @@ tbody td.d{color:var(--muted)}
 <div class="hero" id="hero-view">
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
-  <div class="hero-tag">Gaming Laptop Performance Database</div>
   <h1 class="hero-title">
     <span>LAPTOP</span>
     <span>BENCHMARK</span>
-    <small>Real Data · No Filler</small>
+    <small style="font-family: 'Space Grotesk', sans-serif;">Real data, no filler benchmark database</small>
   </h1>
   <div class="hero-meta">
-    <div class="hero-stat"><div class="hero-stat-n" id="s-n">—</div><div class="hero-stat-l">Laptops</div></div>
-    <div class="hero-stat"><div class="hero-stat-n" id="s-b">5</div><div class="hero-stat-l">Brands</div></div>
+    <div class="hero-stat"><div class="hero-stat-n" id="s-n">—</div><div class="hero-stat-l" style="font-family: 'Space Grotesk', sans-serif;">Laptops</div></div>
+    <div class="hero-stat"><div class="hero-stat-n" id="s-b">5</div><div class="hero-stat-l" style="font-family: 'Space Grotesk', sans-serif;">Brands</div></div>
     </div>
   
   <div class="landing-tiles" id="landing-tiles"></div>
@@ -237,6 +242,7 @@ tbody td.d{color:var(--muted)}
     <button class="nav-link" onclick="goTo('battery')">Battery</button>
     <button class="nav-link" onclick="goTo('thermals')">Thermals</button>
     <button class="nav-link" onclick="goTo('pcmark')">PCMark 10</button>
+    <button class="nav-link" onclick="goTo('spec-filter')">Spec Filter</button>
     <button class="nav-link" onclick="goTo('compare')">Compare</button>
     <button class="nav-link" onclick="goTo('tbl')">Full Data</button>
   </div>
@@ -1317,6 +1323,39 @@ const D=[
     "cpuLoad": 100.0,
     "gpuIdle": 51.0,
     "gpuLoad": 87.0
+  },
+  {
+    "brand": "Acer",
+    "series": "Predator",
+    "model": "Helios Neo 16S AI",
+    "spec": "Core Ultra 9 275HX + RTX 5070 Ti 140W",
+    "year": 2026,
+    "timeSpy": 15567.0,
+    "tsGfx": 15830.0,
+    "tsExtreme": 7886.0,
+    "tsExtremeGfx": 7749.0,
+    "fsExt": 19982.0,
+    "fsExtGfx": 20817.0,
+    "fsExtPhys": 44544.0,
+    "fsUltra": 10573.0,
+    "fsUltraGfx": 10351.0,
+    "fsUltraPhys": 45025.0,
+    "steelNomad": 3713.0,
+    "cbR23S": 2199.0,
+    "cbR23M": 30815.0,
+    "cbR24S": 135.0,
+    "cbR24M": 1642.0,
+    "battery": 3.44,
+    "standby": 10.0,
+    "pcmark": 13092.0,
+    "pcEss": 10213.0,
+    "pcProd": 21810.0,
+    "pcCC": 14778.0,
+    "pcGaming": 24115.0,
+    "cpuIdle": 46.0,
+    "cpuLoad": 100.0,
+    "gpuIdle": 42.0,
+    "gpuLoad": 73.0
   },
   {
     "brand": "Acer",
@@ -2989,16 +3028,19 @@ function barHTML(data,key,limit=20){
   if(!vis.length)return'<div class="no-data">No data for this filter</div>';
   const mx=vis[0][key]||1;
   return'<div class="bar-list">'+vis.map((l,i)=>{
-    const v=l[key],p=pct(v,mx),c=bc(l.brand);
+    const v=l[key],p=pct(v,mx);
+    const opacity=i===0?1:i===1?0.75:i===2?0.55:0.35;
+    const bg=i===0?'linear-gradient(90deg,#8a6d38,#e8c98e)':`rgba(200,169,110,${opacity})`;
+    const color=`rgba(200,169,110,${opacity})`;
     const rk=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
     return`<div class="bar-item">
       <span class="rank ${rk}">${i+1}</span>
       <div class="bar-item-info">
         <div class="bar-model">${l.model}</div>
         <div class="bar-spec">${l.spec}</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${c}"></div></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${bg}"></div></div>
       </div>
-      <div><div class="bar-val" style="color:${c}">${fmt(v)}</div><div class="bar-pct">${p}%</div></div>
+      <div><div class="bar-val" style="color:${color}">${fmt(v)}</div><div class="bar-pct">${p}%</div></div>
     </div>`;}).join('')+'</div>';
 }
 
@@ -3057,31 +3099,42 @@ function renderBattery(){
 }
 
 function renderThermals(){
-  function tempTile(title,icon,idleK,loadK){
-    const idleData=getData().filter(l=>l[idleK]!=null).sort((a,b)=>a[idleK]-b[idleK]);
-    const loadData=getData().filter(l=>l[loadK]!=null).sort((a,b)=>a[loadK]-b[loadK]);
-    if(!idleData.length&&!loadData.length)return tile(title,icon,'°C · Lower = cooler','<div class="no-data">No data</div>');
-    const mxI=Math.max(...idleData.map(l=>l[idleK]),1);
-    const mxL=Math.max(...loadData.map(l=>l[loadK]),1);
-    const rows=(arr,k,mx)=>arr.map(l=>{
-      const v=l[k],p=pct(v,mx);
-      return`<div class="temp-bar-item">
+  function thermalColor(v){
+    if(v==null) return '#666660';
+    if(v<45) return '#7fd68a';
+    if(v<70) return '#e0c85a';
+    if(v<90) return '#e0895a';
+    return '#e05a5a';
+  }
+  function tempTable(title,icon,idleK,loadK){
+    const data=getData().filter(l=>l[idleK]!=null||l[loadK]!=null)
+      .sort((a,b)=>{
+        const ai=a[idleK]!=null?a[idleK]:Infinity;
+        const bi=b[idleK]!=null?b[idleK]:Infinity;
+        return ai-bi;
+      });
+    if(!data.length) return tile(title,icon,'°C · Lower = cooler','<div class="no-data">No data</div>');
+    const rows=data.map(l=>{
+      const iv=l[idleK], lv=l[loadK];
+      const idleCell=iv!=null?`<span style="color:${thermalColor(iv)}">${iv}°C</span>`:'<span style="color:#4a4a45">—</span>';
+      const loadCell=lv!=null?`<span style="color:${thermalColor(lv)}">${lv}°C</span>`:'<span style="color:#4a4a45">—</span>';
+      return `<div class="temp-table-row">
         <div class="temp-bar-name" title="${l.model} — ${l.spec||''}">
           <div class="temp-model">${l.model}</div>
           <div class="temp-spec">${l.spec||''}</div>
         </div>
-        <div class="temp-bar-track"><div class="temp-bar-fill ${tbcls(v)}" style="width:${p}%"></div></div>
-        <div class="temp-val ${tcls(v)}">${v}°C</div>
-      </div>`;}).join('');
-    const body=`<div class="temp-pair">
-      <div class="temp-box"><div class="temp-label">💤 Idle (coolest first)</div>${rows(idleData,idleK,mxI)}</div>
-      <div class="temp-box"><div class="temp-label">🔥 Full Load (coolest first)</div>${rows(loadData,loadK,mxL)}</div>
-    </div>`;
+        <div class="temp-table-cell">${idleCell}</div>
+        <div class="temp-table-cell">${loadCell}</div>
+      </div>`;
+    }).join('');
+    const body=`<div class="temp-table-head">
+      <div></div><div class="temp-table-cell">Idle</div><div class="temp-table-cell">Full Load</div>
+    </div>${rows}`;
     return tile(title,icon,'°C · Lower = cooler',body);
   }
   document.getElementById('thermal-grid').innerHTML=
-    tempTile('CPU Temperature','🧠','cpuIdle','cpuLoad')+
-    tempTile('GPU Temperature','🎮','gpuIdle','gpuLoad');
+    tempTable('CPU Temperature','🧠','cpuIdle','cpuLoad')+
+    tempTable('GPU Temperature','🎮','gpuIdle','gpuLoad');
 }
 
 function renderPCMark(){
